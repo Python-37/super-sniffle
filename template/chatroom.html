@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+<!--扩展base模板，替换里面的标签部分-->
+{% block title %}聊天室{% end %} {% block head %}
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+</head>
+{% end %} {% block css %}
+<link rel="stylesheet" href="css/chatroom.css" />
+{% end %} {% block body %}
+<!-- 导航栏 -->
+<ul class="nav nav-pills">
+    <li><a href="/">首页</a></li>
+    <li class="active">
+        <a href="/chat">聊天室</a>
+    </li>
+    <li>
+        <a href="/files">文件上传与下载</a>
+    </li>
+    <li>
+        <a href="/calc">计算器</a>
+    </li>
+</ul>
+<main>
+    <div class="chat">
+        <div class="titleBar">公共聊天室</div>
+        <div class="panel" id="messages">
+            <div class="message yours">
+                <img src="./yours.png" alt="" />
+                <p><span>你好， {{ user_name }}</span></p>
+            </div>
+        </div>
+        <footer>
+            <button class="chooseSticker">
+                <img src="./emoji.svg" alt="" />
+                <div class="stickers" style="display: inline-flex"></div>
+            </button>
+            <input
+                class="messageInput"
+                type="text"
+                name=""
+                id="text"
+                placeholder="请输入聊天信息"
+            />
+            <button class="send">发送</button>
+        </footer>
+    </div>
+</main>
+{% end %} {% block js %}
+<script>
+    let user_name = "{{ user_name }}";
+</script>
+<script src="js/lottie.min.js"></script>
+<script src="js/chatroom.js"></script>
+{% end %}

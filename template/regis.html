@@ -1,0 +1,21 @@
+{% extends "base.html"%}
+<!--调用模板，把block标签的部分插入模板中-->
+{% block title %}注册{% end %} {% block body %}
+<div id="container">
+    <form action="/regis" method="post">
+        <!--注册Form
+    <!--xsrf 参数，render模块会把生成的xsrf的html替换到这里，在提交Form时
+    这个隐藏的xsrf信息用于Tornado服务端校验，以确保本次提交的Form信息未被黑客篡改。-->
+        {% module xsrf_form_html() %}
+        <input name="uname" type="text" placeholder="uname" required />
+        <!--input类型，输入值后 uname=xxx -->
+        <input name="upass" type="password" placeholder="upass" required />
+        <!--input类型，输入值后 upass=xxx -->
+        <!--submit为html的提交类型，点击后会自动提交对应的表单Form(包含表单内的输入内容)-->
+        <button type="submit">注册(Regist)</button>
+        <p style="color: red; font-weight: 900">{{ notice_message }}</p>
+    </form>
+</div>
+{% end %} {% block js %}
+<script></script>
+{% end %}

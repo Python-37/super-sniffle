@@ -1,0 +1,55 @@
+{
+    // 延伸模组：C/C++、Chinese (Traditional)、indent-rainbow、
+    // Jupyter、Markdown Preview Enhanced、Monokai Pro、
+    // Prettier - Code formatter、Python、Pylance、Vim、YAML
+    "typescript.locale": "zh-TW",
+    "workbench.colorTheme": "Monokai Pro (Filter Spectrum)",
+    "workbench.iconTheme": "Monokai Pro (Filter Spectrum) Icons",
+    "workbench.preferredDarkColorTheme": "Monokai Pro (Filter Machine)",
+    "window.titleBarStyle": "custom",
+    "window.zoomLevel": 0.7,
+    "python.linting.pylintEnabled": false,
+    "python.linting.mypyEnabled": false,
+    "python.linting.flake8Enabled": true,
+    "python.linting.flake8Args": [
+        "--max-line-length=90",
+        "--extend-ignore=E701,F403,E502,E731"
+    ],
+    "python.formatting.provider": "yapf",
+    "python.terminal.launchArgs": [],
+    "python.languageServer": "Pylance",
+    "python.analysis.autoImportCompletions": false,
+    "prettier.tabWidth": 4,
+    "editor.formatOnSave": false,
+    "editor.fontFamily": "Consolas, 'Courier New', monospace",
+    "editor.fontLigatures": false,
+    "editor.fontSize": 15,
+    "editor.fontWeight": 500,
+    "[html]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "[javascript]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "[jsonc]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "[yaml]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "[json]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "[typescript]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "terminal.integrated.fontFamily": "Consolas, 'Courier New', monospace",
+    "terminal.integrated.automationShell.windows": "",
+    "terminal.integrated.shell.windows": "C:\\Program Files\\PowerShell\\7\\pwsh.exe",
+    "terminal.integrated.inheritEnv": false,
+    "terminal.external.windowsExec": "C:\\Program Files\\PowerShell\\7\\pwsh.exe",
+    "files.eol": "\n",
+    "[shellscript]": {
+        "files.eol": "\n"
+    }
+}

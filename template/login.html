@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+<!--扩展base模板，替换里面的标签部分-->
+{% block title %}登入{% end %} {% block body %}
+<div id="container">
+    <form action="/login" method="post">
+        {% module xsrf_form_html() %}
+        <input name="uname" type="text" placeholder="uname" required />
+        <input name="upass" type="password" placeholder="upass" required />
+        <!--submit为html的提交类型，点击后会自动提交对应的表单-->
+        <button type="submit">登入(LOGIN)</button>
+        <!--onclick添加JS里的relocal()功能，this为传入这个HTML的button对象-->
+        <button type="button" onclick="relocal(this)">注册(REGIS)</button>
+        <p style="color: red; font-weight: 900">{{ notice_message }}</p>
+    </form>
+    {% end %} {% block js %}
+    <!--JS模板标签-->
+    <script>
+        function relocal(self) {
+            window.location.href = "/regis"; // button被点击后，页面跳转到/regist注册页面
+        }
+    </script>
+    {% end %}
+</div>

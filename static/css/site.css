@@ -1,0 +1,114 @@
+﻿body {
+    color: whitesmoke;
+    background-color: #0d1117;
+    font-family: Arial, "Microsoft YaHei", sans-serif;
+    box-sizing: border-box;
+}
+
+ul {
+    /* 重写 ul li 样式 */
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    padding-top: 6px;
+    padding-bottom: 6px;
+}
+li {
+    display: inline;
+}
+a:link,
+a:visited {
+    font-weight: bold;
+    color: black;
+    background-color: #ffffff;
+    text-align: center;
+    padding: 6px;
+    text-decoration: none;
+    text-transform: uppercase;
+}
+a:hover,
+a:active {
+    background-color: rgb(50, 65, 145);
+}
+
+.nav {
+    display: flex;
+}
+
+.nav > .active {
+    background-color: rgb(50, 65, 145);
+}
+
+.btn {
+    color: rgb(255, 255, 255);
+    background-color: rgb(7, 61, 148);
+    border-radius: 25px;
+}
+
+textarea {
+    /* 用于聊天室介面 */
+    resize: vertical;
+    background-color: #161b22;
+}
+
+.right {
+    /* 用于登入登出按钮 */
+    position: absolute;
+    float: right;
+    right: 0px;
+    margin-right: 0px;
+}
+
+input {
+    width: 128px;
+    height: 64px;
+    margin-top: 2px;
+    border-bottom: dashed;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    outline: none;
+    color: rgb(50, 65, 145);
+    background-color: black;
+}
+button {
+    width: 128px;
+    height: 32px;
+    margin-top: 8px;
+    outline: none;
+    color: rgb(50, 65, 145);
+    background-color: black;
+}
+
+#container {
+    /* 用于登入注册介面 */
+    width: 128px;
+    height: 256px;
+    margin-top: 64px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#file_area {
+    /* 用于文件上传下载介面 */
+    position: relative;
+    display: inline-block;
+    color: springgreen;
+    background-color: gray;
+    width: auto;
+    height: auto;
+}
+
+.file_name_box {
+    /* 用于文件上传下载介面 */
+    vertical-align: middle;
+    line-height: 30px;
+    margin: 10px 0 0 15px;
+    padding: 0 15px;
+    border: 1px solid #dcdcdc;
+    background: #f5f5f5;
+    border-radius: 15px;
+    cursor: default;
+    color: #016392;
+    display: none;
+}

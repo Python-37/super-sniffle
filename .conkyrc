@@ -1,0 +1,96 @@
+-- vim: ts=4 sw=4 noet ai cindent syntax=lua
+
+
+conky.config = {
+    alignment = 'top_right',
+    background = true,
+    border_width = 0,
+    cpu_avg_samples = 4,
+    default_color = 'white',
+    default_outline_color = 'grey',
+    default_shade_color = 'black',
+    double_buffer = true,
+    draw_borders = false,
+    draw_graph_borders = true,
+    draw_outline = false,
+    draw_shades = false,
+    use_xft = true,
+    font = 'DejaVu Sans Mono:size=12',
+    gap_x = 10,
+    gap_y = 10,
+    minimum_height = 5,
+    minimum_width = 280,
+    net_avg_samples = 2,
+    double_buffer = true,
+    out_to_console = false,
+    out_to_stderr = false,
+    extra_newline = false,
+    own_window = true,
+    own_window_colour = '000000',
+    own_window_class = 'Conky',
+    own_window_argb_visual = true,
+    own_window_argb_value = 0,
+    own_window_argb_count = 0,
+    own_window_type = 'normal',
+    own_window_transparent = true,
+    own_window_hints = 'undecorated,sticky,below,skip_taskbar,skip_pager',
+    override_utf8_locale = true,
+    stippled_borders = 0,
+    update_interval = 2,
+    uppercase = false,
+    use_spacer = 'none',
+    show_graph_scale = false,
+    show_graph_range = false,
+}
+
+conky.text = [[
+# ${image ~/.face -p 20,5 -s 70x70 -f 86400}
+# ${font Noto Sans:bold:size=8}${alignc}    ${exec hostnamectl | grep System | cut -c21-40}
+# ${font Noto Sans:bold:size=8}${alignc}    ${exec hostnamectl | grep Architecture | cut -c7-30}
+# ${font Latin Modern Mono Caps:bold:size=14}${alignc}${color 00ffae}   ${exec hostnamectl | grep Kernel | cut -c13-32}
+${font Entopia:bold:size=12}${color 33E9FF}PERFORMANCE ${hr 2}${font}
+${offset 15}${color FFFDE2}System Uptime ${alignr}${color yellow} ${uptime}
+${offset 15}${color FFFDE2}RAM : $mem $memperc% ${color yellow}${membar 4}
+${offset 15}${color FFFDE2}Swap: $swap/$swapmax $swapperc% ${color yellow}${swapbar 4}
+${offset 15}${color FFFDE2}Frequency: ${freq dyn} MHz${alignr} CPU Usage: ${cpu cpu0} %
+${offset 15}${color FFFDE2}CPU Usage Graph
+${offset 5}${color ff8300}${cpugraph cpu0 80,600  104E8B 00ffff}${color FFFDE2}
+${offset 15}${font}${color FFFDE2}Procs:${color yellow}  $processes  ${color FFFDE2}Run:${color yellow} $running_processes ${color FFFDE2}Temp: ${color yellow} ${acpitemp}°C
+
+${font Entopia:bold:size=12}${color green}NETWORK ${hr 2}${font DejaVu Sans Mono:size=9}
+# ${offset 15}${color yellow}Ext IP Addr ${color red}${alignr}${exec curl "http://ip-api.com/json/" | jq "[.regionName, .city, .query]" | jq 'join(";")'}
+${offset 15}${color yellow}IPv4 Addr ${color red}${alignr}${addr eth0}
+${offset 15}${color green}${font}▼ $color${totaldown eth0} ${alignr}${color green}▲ $color${totalup eth0}
+${offset 5}${offset 5}${font Entopia:bold:size=12}${color orange}${wireless_essid wlan0} ${stippled_hr 1}
+${offset 15}${color yellow}${font DejaVu Sans Mono:size=9}WiFi ${alignr}${wireless_link_qual_perc wlan0}%(${wireless_link_qual wlan0}/${wireless_link_qual_max wlan1}) ${color red}${addr wlan1}
+${offset 15}${font}${color green}▼ $color${totaldown wlan0} ${alignr}${color green}▲ $color${totalup wlan0}
+${offset 15}${color yellow}Entropy: ${color4}${entropy_avail}${color yellow}/${color4}${entropy_poolsize} ${color yellow}${entropy_bar}
+${offset 15}${color yellow}Net Down:$color4 ${downspeed wlan0} /s ${alignr}${color yellow}Net Up:$color4 ${upspeed wlan0} /s
+${offset 15}${color yellow}${downspeedgraph wlan0 32,300 104E8B ffff00} ${alignr}${color yellow}${upspeedgraph wlan0 32,300 104E8B 00ffff}
+
+${color yellow}Port(s) ${alignr} \#Connections${color ff8300}
+${color ff8300} Inbound: ${tcp_portmon 1 32767 count}  Outbound: ${tcp_portmon 32768 61000 count}${alignr}ALL: ${tcp_portmon 1 65535 count}
+${color yellow}Inbound Connection ${alignr} Local Service/Port${color ff8300}
+${offset 5}${tcp_portmon 1 32767 rhost 0} ${alignr} ${tcp_portmon 1 32767 lservice 0}
+${offset 5}${tcp_portmon 1 32767 rhost 1} ${alignr} ${tcp_portmon 1 32767 lservice 1}
+${offset 5}${tcp_portmon 1 32767 rhost 2} ${alignr} ${tcp_portmon 1 32767 lservice 2}
+${color yellow}Outbound Connection ${alignr} Remote Service/Port${color ff8300}
+${offset 5}${tcp_portmon 32768 61000 rhost 0} ${alignr} ${tcp_portmon 32768 61000 rservice 0}
+${offset 5}${tcp_portmon 32768 61000 rhost 1} ${alignr} ${tcp_portmon 32768 61000 rservice 1}
+${offset 5}${tcp_portmon 32768 61000 rhost 2} ${alignr} ${tcp_portmon 32768 61000 rservice 2}
+
+${font Entopia:bold:size=12}${color red}PROCESSES ${hr 2}
+${offset 15}${font Noto sans:size=8}${color EDE0FF}Name ${alignr}PID   CPU%   MEM%
+${offset 15}${color FF7878}${top name 1} ${alignr}${top pid 1} ${top cpu 1} ${top mem 1}
+${offset 15}${color FF7878}${top name 2} ${alignr}${top pid 2} ${top cpu 2} ${top mem 2}
+${offset 15}${color FF7878}${top name 3} ${alignr}${top pid 3} ${top cpu 3} ${top mem 3}
+${offset 15}${color FF7878}${top name 4} ${alignr}${top pid 4} ${top cpu 4} ${top mem 4}
+${offset 15}${color FF7878}${top name 5} ${alignr}${top pid 5} ${top cpu 5} ${top mem 5}
+
+${font Entopia:bold:size=12}${color 7cfc00} DISKINFO ${hr 2}
+${offset 15}${color 7cfc00}disk : ${diskio}
+${offset 15}${color 7cfc00}diskGraph : ${diskiograph}
+${offset 15}${color 7cfc00}Root partition: ${alignr}${fs_free /} /${fs_size /}
+
+${font Entopia:bold:size=12}${color 33E9FF}END ${hr 2}${font}
+]]

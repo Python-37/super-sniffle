@@ -1,0 +1,486 @@
+{% extends "base.html" %}
+<!--扩展base模板，替换里面的标签部分-->
+{% block title %}计算器{% end %}{% block css %}
+<style>
+    #divMain {
+        margin: auto;
+        width: 80%;
+    }
+    .calc-edit {
+        background: linear-gradient(#eed, #bba);
+        border-radius: 5px;
+        box-shadow: inset -2px -2px 2px rgba(255, 255, 255, 0.5),
+            inset 2px 2px 2px rgba(0, 0, 0, 0.5);
+        color: #333;
+    }
+    .calc-history,
+    .calc-input {
+        font-family: Courier New, Courier New, monospace;
+        font-size: large;
+        font-weight: bold;
+        box-sizing: border-box;
+        display: block;
+        margin: 8px auto;
+        padding: 8px;
+        width: 100%;
+        padding-right: 16px;
+    }
+    .calc-history {
+        text-align: right;
+        height: 240px;
+        overflow: auto;
+    }
+    .calc-main {
+        display: block;
+        padding: 16px;
+        font: bold 15px/28px Arial, Helvetica, sans-serif;
+        border: 1px solid #888;
+        border-radius: 12px;
+        background: radial-gradient(#440, #330, #220);
+        box-shadow: inset -8px -8px 4px rgba(0, 0, 0, 0.4),
+            inset 8px 8px 4px rgba(255, 255, 255, 0.4),
+            8px 8px 4px rgba(0, 0, 0, 0.4);
+    }
+    .calc-button {
+        cursor: pointer;
+        width: 50px;
+        height: 28px;
+        color: #eee;
+        margin: 5px 4px;
+        border: 1px solid black;
+        box-shadow: 0 1px rgba(255, 255, 255, 0.1);
+        border-radius: 6px;
+        box-shadow: inset 0 -15px 1px rgba(0, 0, 0, 0.5),
+            inset 0 1px 1px rgba(255, 255, 255, 0.5),
+            inset 0 8px 8px rgba(255, 255, 255, 0.5);
+        font: bold 15px/28px Arial, Helvetica, sans-serif;
+    }
+    .calc-button:hover {
+        color: #fff;
+        text-shadow: 0px 0px 8px rgb(255, 230, 186),
+            0px 0px 22px rgb(255, 255, 255), 0px -1px 0px rgba(0, 0, 0, 0.5);
+    }
+    .calc-button-black {
+        background-color: #222;
+        background: radial-gradient(#444, #222, #000);
+    }
+    .calc-button-blue {
+        background-color: #004;
+        background: radial-gradient(#008, #004, #002);
+    }
+    .calc-button-green {
+        background-color: #040;
+        background: radial-gradient(#080, #040, #020);
+    }
+    .calc-button-brown {
+        background-color: #322;
+        background: radial-gradient(#433, #322, #211);
+    }
+    .calc-button-orange {
+        color: black;
+        background-color: #d82;
+        background: radial-gradient(#fa4, #d82, #b60);
+    }
+    .calc-button-purple {
+        background-color: #704;
+        background: radial-gradient(#a06, #704, #402);
+    }
+    .calc-active {
+        color: yellow;
+        border-color: yellow;
+    }
+    .calc-display {
+        font: bold 15px/28px Arial, Helvetica, sans-serif;
+        font-size: 45px;
+        height: 60px;
+        overflow-x: auto;
+        overflow-y: hidden;
+        padding: 0 8px;
+        line-height: 61px;
+        text-align: right;
+        white-space: nowrap;
+        cursor: default;
+        text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.01);
+    }
+</style>
+{% end %} {% block js %}
+<script>
+    function GetCaretPosition(ctrl) {
+        var CaretPos = 0;
+        if (document.selection) {
+            ctrl.focus();
+            var Sel = document.selection.createRange();
+            Sel.moveStart("character", -ctrl.value.length);
+            CaretPos = Sel.text.length;
+        } else if (ctrl.selectionStart || ctrl.selectionStart == "0")
+            CaretPos = ctrl.selectionStart;
+        return CaretPos;
+    }
+
+    function SetCaretPosition(ctrl, pos) {
+        if (ctrl.setSelectionRange) {
+            ctrl.focus();
+            ctrl.setSelectionRange(pos, pos);
+        } else if (ctrl.createTextRange) {
+            var range = ctrl.createTextRange();
+            range.collapse(true);
+            range.moveEnd("character", pos);
+            range.moveStart("character", pos);
+            range.select();
+        }
+    }
+
+    (function ($) {
+        $.fn.jsRapCalculator = function (options) {
+            var defaults = {
+                showMode: true,
+                showBitwise: true,
+                showHistory: true,
+                maximumFractionDigits: 20,
+            };
+
+            function AddButton(base, d, t, c, i) {
+                var o = $(
+                    '<button class="calc-button ' +
+                        c +
+                        '" title="' +
+                        i +
+                        '">' +
+                        t +
+                        "</button>"
+                ).appendTo(d);
+                $(o).bind({
+                    click: function (e) {
+                        var k = $(this).text();
+                        var t = $(base.divin).val();
+                        var e = $.Event("keyup");
+                        switch (k) {
+                            case "=":
+                                e.keyCode = 13;
+                                break;
+                            case "DEL":
+                                t = t.substring(0, t.length - 1);
+                                $(base.divin).val(t);
+                                break;
+                            case "AC":
+                                $(base.divin).val("");
+                                $(base.divre).text("0");
+                                break;
+                            case "DEC":
+                                base.SetMode(10, k);
+                                break;
+                            case "HEX":
+                                base.SetMode(16, k);
+                                break;
+                            case "BIN":
+                                base.SetMode(2, k);
+                                break;
+                            case "OCT":
+                                base.SetMode(8, k);
+                                break;
+                            default:
+                                switch (k) {
+                                    case "÷":
+                                        k = "/";
+                                        break;
+                                    case "×":
+                                        k = "*";
+                                        break;
+                                    case "π":
+                                        k = "PI";
+                                        break;
+                                    case "e":
+                                        k = "E";
+                                        break;
+                                    case "EXP":
+                                        k = "e";
+                                        break;
+                                    case "MOD":
+                                        k = "%";
+                                        break;
+                                    case "OR":
+                                        k = "|";
+                                        break;
+                                    case "AND":
+                                        k = "&";
+                                        break;
+                                    case "XOR":
+                                        k = "^";
+                                        break;
+                                    case "NOT":
+                                        k = "~";
+                                        break;
+                                    case "SHL":
+                                        k = "<<";
+                                        break;
+                                    case "SHR":
+                                        k = ">>>";
+                                        break;
+                                }
+                                var cp = GetCaretPosition(base.divin[0]);
+                                var s =
+                                    t.substring(0, cp) +
+                                    k +
+                                    t.substring(cp, t.length);
+                                $(base.divin).val(s);
+                                SetCaretPosition(base.divin[0], cp + k.length);
+                        }
+                        $(base.divin).trigger(e);
+                    },
+                });
+                return o;
+            }
+
+            return this.each(function () {
+                this.SetMode = function (m, n) {
+                    this.mode = m;
+                    this.modeName = n;
+                    $(".calc-mode2").removeClass("calc-active");
+                    $(".calc-mode8").removeClass("calc-active");
+                    $(".calc-mode10").removeClass("calc-active");
+                    $(".calc-mode16").removeClass("calc-active");
+                    $(".calc-mode" + m).addClass("calc-active");
+                };
+                this.settings = $.extend(defaults, options);
+                $(this).addClass("calc-main");
+                this.divre = $("<div>")
+                    .addClass("calc-edit calc-display")
+                    .text("0")
+                    .appendTo(this);
+                if (this.settings.showMode) {
+                    var d = $("<div>").appendTo(this);
+                    AddButton(
+                        this,
+                        d,
+                        "HEX",
+                        "calc-button-green calc-mode16",
+                        "Mode Hexadecimal"
+                    );
+                    AddButton(
+                        this,
+                        d,
+                        "DEC",
+                        "calc-button-green calc-mode10 calc-active",
+                        "Mode Decimal"
+                    );
+                    AddButton(
+                        this,
+                        d,
+                        "OCT",
+                        "calc-button-green calc-mode8",
+                        "Mode Octal"
+                    );
+                    AddButton(
+                        this,
+                        d,
+                        "BIN",
+                        "calc-button-green calc-mode2",
+                        "Mode Binary"
+                    );
+                }
+                var d = $("<div>").appendTo(this);
+                AddButton(this, d, "0", "calc-button-black", "");
+                AddButton(this, d, "1", "calc-button-black", "");
+                AddButton(this, d, "2", "calc-button-black", "");
+                AddButton(this, d, "3", "calc-button-black", "");
+                AddButton(this, d, "4", "calc-button-black", "");
+                AddButton(this, d, "5", "calc-button-black", "");
+                AddButton(this, d, "6", "calc-button-black", "");
+                AddButton(this, d, "7", "calc-button-black", "");
+                AddButton(this, d, "8", "calc-button-black", "");
+                AddButton(this, d, "9", "calc-button-black", "");
+                AddButton(this, d, ".", "calc-button-black", "");
+                if (this.settings.showBitwise) {
+                    var d = $("<div>").appendTo(this);
+                    AddButton(
+                        this,
+                        d,
+                        "EXP",
+                        "calc-button-blue",
+                        "Exponentiation"
+                    );
+                    AddButton(
+                        this,
+                        d,
+                        "MOD",
+                        "calc-button-blue",
+                        "Division Remainder"
+                    );
+                    AddButton(this, d, "OR", "calc-button-blue", "Bitwise OR");
+                    AddButton(
+                        this,
+                        d,
+                        "AND",
+                        "calc-button-blue",
+                        "Bitwise AND"
+                    );
+                    AddButton(
+                        this,
+                        d,
+                        "XOR",
+                        "calc-button-blue",
+                        "Bitwise XOR"
+                    );
+                    AddButton(
+                        this,
+                        d,
+                        "NOT",
+                        "calc-button-blue",
+                        "Bitwise NOT"
+                    );
+                    AddButton(
+                        this,
+                        d,
+                        "SHL",
+                        "calc-button-blue",
+                        "Zero fill left shift"
+                    );
+                    AddButton(
+                        this,
+                        d,
+                        "SHR",
+                        "calc-button-blue",
+                        "Zero fill right shift"
+                    );
+                    AddButton(this, d, "&pi;", "calc-button-purple", "PI");
+                    AddButton(
+                        this,
+                        d,
+                        "e",
+                        "calc-button-purple",
+                        "Euler's number"
+                    );
+                }
+                var d = $("<div>").appendTo(this);
+                AddButton(this, d, "+", "calc-button-brown", "");
+                AddButton(this, d, "-", "calc-button-brown", "");
+                AddButton(this, d, "&times;", "calc-button-brown", "");
+                AddButton(this, d, "&divide;", "calc-button-brown", "");
+                this.butOpen = AddButton(
+                    this,
+                    d,
+                    "(",
+                    "calc-button-brown calc-open",
+                    ""
+                );
+                this.butClose = AddButton(
+                    this,
+                    d,
+                    ")",
+                    "calc-button-brown calc-close",
+                    ""
+                );
+                if (this.settings.showHistory)
+                    this.butEqual = AddButton(
+                        this,
+                        d,
+                        "=",
+                        "calc-button-brown calc-equal",
+                        ""
+                    );
+                var d = $("<div>").appendTo(this);
+                AddButton(this, d, "AC", "calc-button-orange", "All Clear");
+                AddButton(this, d, "DEL", "calc-button-orange", "Delete");
+                this.divin = $("<input>")
+                    .addClass("calc-edit calc-input")
+                    .appendTo(this);
+                if (this.settings.showHistory)
+                    this.divHistory = $("<div>")
+                        .addClass("calc-edit calc-history")
+                        .appendTo(this);
+                var base = this;
+                $(this.divin).bind({
+                    keyup: function (e) {
+                        base.Calculate(e);
+                    },
+                });
+
+                this.Calculate = function (e) {
+                    base.divin.focus();
+                    var c = $(base.divin).val();
+                    var bo = (c.match(/\(/g) || []).length;
+                    var bc = (c.match(/\)/g) || []).length;
+                    if (bo > bc) $(base.butClose).addClass("calc-active");
+                    else $(base.butClose).removeClass("calc-active");
+                    if (bo < bc) $(base.butOpen).addClass("calc-active");
+                    else $(base.butOpen).removeClass("calc-active");
+                    c = c.replace(new RegExp(" ", "g"), "");
+                    var c2 = c;
+                    c2 = c2.replace("E", "Math.E");
+                    c2 = c2.replace("PI", "Math.PI");
+                    c2 = c2.replace("asin", "Math.asin");
+                    c2 = c2.replace("atan", "Math.atan");
+                    c2 = c2.replace("cos", "Math.cos");
+                    c2 = c2.replace("exp", "Math.exp");
+                    c2 = c2.replace("log", "Math.log");
+                    c2 = c2.replace("pow", "Math.pow");
+                    c2 = c2.replace("sin", "Math.sin");
+                    c2 = c2.replace("tan", "Math.tan");
+                    if (base.butEqual)
+                        $(base.butEqual).removeClass("calc-active");
+                    $(base.divre).text(0);
+                    try {
+                        var v = eval(c2);
+                    } catch (err) {
+                        return;
+                    }
+                    if (isNaN(v)) return;
+                    if (base.butEqual) $(base.butEqual).addClass("calc-active");
+                    if (base.mode != 10) v = v.toString(base.mode);
+                    else
+                        v = v.toLocaleString(undefined, {
+                            maximumFractionDigits:
+                                base.settings.maximumFractionDigits,
+                        });
+                    $(base.divre).text(v);
+                    if (this.divHistory && e && e.keyCode == 13) {
+                        var d = $(base.divHistory);
+                        d.append(c + " " + this.modeName + "<br>" + v + "<br>");
+                        d.scrollTop(d[0].scrollHeight - d[0].clientHeight);
+                    }
+                };
+
+                this.SetMode(10, "DEC");
+            });
+        };
+    })(jQuery);
+</script>
+<script>
+    $(document).ready(function () {
+        $("#demo1").jsRapCalculator({ name: "name1" });
+        $("#demo2").jsRapCalculator({
+            showMode: false,
+            showBitwise: false,
+            showHistory: false,
+            maximumFractionDigits: 2,
+        });
+    });
+</script>
+{% end %} {% block body %}
+<ul class="nav nav-pills">
+    <li><a href="/">首页</a></li>
+    <li>
+        <a href="/chatroom">聊天室</a>
+    </li>
+    <li>
+        <a href="/files">文件上传与下载</a>
+    </li>
+    <li class="active">
+        <a href="/calculator">计算器</a>
+    </li>
+</ul>
+<div id="divMain">
+    <div>科学计算器</div>
+    <div id="demo1"></div>
+    <div>简易计算器</div>
+    <div id="demo2"></div>
+    <!-- 用法说明部分 -->
+    <br />用法实例<br />5 的 3 次方 = <b>pow(5,3)</b> = 125 <br />4 的算数平方根
+    = <b>pow(4,1/2)</b> = 2 <br />27 的三次方根 = <b>pow(27,1/3)</b> = 3
+    <br />16 的四次方根 = <b>pow(16,1/4)</b> = 2 <br />1/2 &pi; 的正弦 =
+    <b>sin(1/2*PI)</b> = 1 <br />101 的二进制 = <b>0b101</b> = 5 <br />402
+    的十六进制 = <b>0402</b> = 258 <br />1F 的八进制 = <b>0x1F</b> = 31
+    <br />指数化 2 * 1000 = <b>2e3</b> = 2000 <br />指数化 3 * 0.01 =
+    <b>3e-2</b> = 0.03
+</div>
+{% end %}

@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+<!--扩展base模板，替换里面的标签部分-->
+{% block title %}主页{% end %} {% block body %}
+<!-- 导航栏 -->
+<ul class="nav">
+    <li class="active"><a href="/">首页</a></li>
+    <li>
+        <a href="/chat">聊天室</a>
+    </li>
+    <li>
+        <a href="/files">文件上传与下载</a>
+    </li>
+    <li>
+        <a href="/calc">计算器</a>
+    </li>
+</ul>
+
+<fieldset>
+    <legend>我的常用网站</legend>
+    <ul>
+        <li>
+            Python 相关
+            <ul>
+                <li><a href="https://docs.python.org/zh-cn/3/">官方文档</a></li>
+                <li>
+                    <a
+                        href="https://python3-cookbook.readthedocs.io/zh_CN/latest/"
+                        >Python Cookbook</a
+                    >
+                </li>
+                <li><a href="https://geek-docs.com/opencv">OpenCV 教程</a></li>
+            </ul>
+        </li>
+        <li>
+            镜像源
+            <ul>
+                <li>
+                    <a href="https://mirrors.tuna.tsinghua.edu.cn/"
+                        >清华 TUNA</a
+                    >
+                </li>
+                <li><a href="https://mirrors.bfsu.edu.cn/">北外</a></li>
+                <li><a href="https://mirrors.ustc.edu.cn/">中科大</a></li>
+                <li><a href="http://mirrors.neusoft.edu.cn/">东软</a></li>
+                <li><a href="https://developer.aliyun.com/mirror/">阿里</a></li>
+                <li><a href="https://npm.taobao.org/mirrors">cnpm 镜像</a></li>
+                <li><a href="http://mirrors.163.com/">网易</a></li>
+            </ul>
+        </li>
+        <li>
+            开发技能网站
+            <ul>
+                <li><a href="https://github.com/">GitHub</a></li>
+                <li>
+                    <a href="https://www.oschina.net/">开源中国</a>
+                </li>
+                <li>
+                    <a href="https://www.w3school.com.cn/index.html"
+                        >W3School</a
+                    >
+                </li>
+                <li><a href="http://gitd.cc/">GitHub 代下载</a></li>
+            </ul>
+        </li>
+        <li>
+            日常使用网站
+            <ul>
+                <li><a href="https://cn.bing.com/">Bing 搜索</a></li>
+                <li>
+                    <a
+                        href="https://translate.google.cn/?sl=zh-CN&tl=en&op=translate"
+                        >Google 翻译</a
+                    >
+                </li>
+            </ul>
+        </li>
+    </ul>
+</fieldset>
+
+{% end %} {% block js %}
+<script type="text/javascript">
+    $(function () {
+        $("li:has(ul)")
+            .click(function (event) {
+                //event表示事件对象
+                //js中事件是会冒泡的，所以this是可以变化的，但event.target不会变化，它永远是直接接受事件的目标DOM元素；
+                if (this == event.target) {
+                    //event.target属性的作用是获取到出发事件的元素
+                    if ($(this).children().is(":hidden")) {
+                        $(this).children().show();
+                    } else {
+                        $(this).children().hide();
+                    }
+                }
+            })
+            .css("cursor", "pointer")
+            .click();
+    });
+</script>
+{% end %}
