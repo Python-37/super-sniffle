@@ -101,9 +101,10 @@ if __name__ == "__main__":
         os.path.abspath(__file__)), time.strftime("%Y-%m-%d"))  # 文件名
     t_options.log_file_num_backups = 10  # 间隔
     t_options.log_to_stderr = True  # 输出到屏幕
+    t_options.define("port", default=HOST_PORT, type=int)
     t_options.parse_command_line()
 
-    application.listen(HOST_PORT)
+    application.listen(t_options.port)
     signal.signal(signal.SIGINT, sig_exit)
     signal.signal(signal.SIGTERM, sig_exit)
     IOLoop.current().start()
