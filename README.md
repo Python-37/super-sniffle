@@ -15,6 +15,7 @@
 |          tiny_code           |                                      可复用的少量代码                                       |    Y     |
 |     tornado_handlers.py      |                                       tornado 路由类                                        |    Y     |
 |    tornado_web_server.py     |                            使用 ctrl+c 可以停止的 tornado 服务器                            |    Y     |
+| tornado_web_server_legacy.py |        使用 ctrl+c 可以停止的 tornado 服务器，相容较旧版本 Python 或 tornado 的写法         |    Y     |
 | tornado_websocket_client.py  |                            使用 totnado 实现的 websocket 客户端                             |    N     |
 |           utils.py           |                               提供绝对单例类和同参单例类元类                                |    Y     |
 |           .conkyrc           |                                         conky 配置                                          |    Y     |
