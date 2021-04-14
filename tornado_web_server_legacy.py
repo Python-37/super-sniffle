@@ -4,86 +4,23 @@
 使用了以下连结中提到的实现，可以正常运行在较低Python版本(如3.6)上
 https://stackoverflow.com/questions/17101502/how-to-stop-the-tornado-web-server-with-ctrlc
 """
-__version__ = 1 + 1e-1 + 1j
+__version__ = 1 + 1e-1 + 2j
 __author__ = "Bavon C. K. Chao (赵庆华)"
 
 import os
 import signal
 import time
-from configparser import ConfigParser
 
 import tornado
 from tornado.httpserver import HTTPServer
 from tornado.ioloop import IOLoop, PeriodicCallback
 from tornado.log import logging as t_logging
 from tornado.options import options as t_options
-from tornado.web import Application, StaticFileHandler
 
-from tornado_handlers import (BaseHandler, CalcPageHandler, ChatHandler,
-                              ChatPageHandler, CheckLoggedMixin,
-                              UploadFileHandler, UserLogin, UserLogout,
-                              UserRegis)
+from tornado_web_server import application, config
 
-os.makedirs("logs", exist_ok=True)
-config = ConfigParser()
-config.read("settings.ini")
 tornado_settings = config["tornado server"]
 HOST_PORT = tornado_settings.getint("host_port")
-
-
-class MainHandler(CheckLoggedMixin, BaseHandler):
-    """处理主页请求"""
-    def get(self, *args, **kwargs):
-        user_name, logged_in = self.check_login()
-        params = {"logged_in": logged_in, "logging_in": False}
-        self.render("index.html", **params)
-
-    def post(self, *args, **kwargs):
-        super().post(*args, **kwargs)
-        self.write({"msg": "succeed"})
-
-
-class DownloadHandler(CheckLoggedMixin, StaticFileHandler):
-    """处理需要登录才能下载的文件"""
-    async def get(self, *args, **kwargs) -> None:
-        user_name, logged_in = self.check_login()
-        if not logged_in:
-            # 没登录禁止下载
-            raise tornado.web.HTTPError(
-                403.16,
-                log_message=f"{user_name} 企图下载 {args}，但未成功",
-                reason="Must login")
-        t_logging.info(f"{user_name} 正在下载 {args}")
-        await super().get(*args, **kwargs)
-
-
-application = Application(
-    [
-        (r"/$", MainHandler),
-        (r'/login', UserLogin),
-        (r'/logout', UserLogout),
-        (r'/regis', UserRegis),
-        (r'/calc(ulator)?(\.html)?$', CalcPageHandler),
-        (r"/chat(room)?(\.html)?$", ChatPageHandler),
-        (r"/wsschat$", ChatHandler),
-        (r"/file(s)?(\.html)?$", UploadFileHandler),
-        (rf"/{tornado_settings['file_upload_dir']}/(.*\.*[\w\d]+)$",
-         DownloadHandler, {
-             "path": tornado_settings["file_upload_dir"],
-         }),
-        (r"/(.*\.(?!py\w*)\w+)$", StaticFileHandler, {
-            "path": tornado_settings["static_dir"],
-            "default_filename": "README.md"
-        }),
-    ],
-    static_path=tornado_settings.get("static_dir"),
-    template_path=tornado_settings.get("template_dir"),
-    cookie_secret=tornado_settings.get("cookie_secret"),
-    login_url='/login',
-    xsrf_cookies=True,
-    debug=tornado_settings.getboolean("debug"),
-    autoreload=False,
-)
 
 
 class MyHTTPServer(HTTPServer):
