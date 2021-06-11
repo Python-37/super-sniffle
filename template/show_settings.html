@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+<!--扩展base模板，替换里面的标签部分-->
+{% block title %}VS Code 配置文件{% end %}{% block css %}
+<style>
+    pre {
+        outline: 1px solid #ccc;
+        padding: 5px;
+        margin: 5px;
+    }
+    .string {
+        color: yellow;
+    }
+    .number {
+        color: darkorange;
+    }
+    .boolean {
+        color: purple;
+    }
+    .null {
+        color: red;
+    }
+    .key {
+        color: wheat;
+    }
+</style>
+{% end %} {% block body %}
+<!-- 导航栏 -->
+<ul class="nav">
+    <li><a href="/">首页</a></li>
+    <li>
+        <a href="/chatroom">聊天室</a>
+    </li>
+    <li>
+        <a href="/files">文件上传与下载</a>
+    </li>
+    <li>
+        <a href="/calc">计算器</a>
+    </li>
+    <li class="active">
+        <a href="/vscode_settings">VS Code 配置</a>
+    </li>
+</ul>
+<br />
+<button class="btn" id="copy-btn" style="color: springgreen">
+    复制到剪贴板
+</button>
+<pre id="settings">
+    {{ settings_content }}
+</pre>
+{% end %} {% block js %}
+<script type="text/javascript">
+    function syntaxHighlight(json) {
+        if (typeof json != "string") {
+            json = JSON.stringify(json, undefined, 2);
+        }
+        json = json.replace(/&/g, "&").replace(/</g, "<").replace(/>/g, ">");
+        return json.replace(
+            /("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g,
+            function (match) {
+                var cls = "number";
+                if (/^"/.test(match)) {
+                    if (/:$/.test(match)) {
+                        cls = "key";
+                    } else {
+                        cls = "string";
+                    }
+                } else if (/true|false/.test(match)) {
+                    cls = "boolean";
+                } else if (/null/.test(match)) {
+                    cls = "null";
+                }
+                return '<span class="' + cls + '">' + match + "</span>";
+            }
+        );
+    }
+    $("#settings").html(syntaxHighlight($("#settings").html()));
+    $("#copy-btn").click(function () {
+        const range = document.createRange();
+        range.selectNode(document.getElementById("settings"));
+
+        const selection = window.getSelection();
+        if (selection.rangeCount > 0) selection.removeAllRanges();
+        selection.addRange(range);
+        document.execCommand("copy");
+        alert("复制成功！");
+    });
+</script>
+{% end %}

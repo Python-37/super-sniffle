@@ -5,7 +5,7 @@
 此处使用的是可以工作在新版本（Python 3.8）的实现。
 https://stackoverflow.com/questions/17101502/how-to-stop-the-tornado-web-server-with-ctrlc
 """
-__version__ = 1 + 1e-1 + 1j
+__version__ = 1 + 2e-1 + 1j
 __author__ = "Bavon C. K. Chao (赵庆华)"
 
 import os
@@ -22,7 +22,7 @@ from tornado.web import Application, StaticFileHandler
 from tornado_handlers import (BaseHandler, CalcPageHandler, ChatHandler,
                               ChatPageHandler, CheckLoggedMixin,
                               UploadFileHandler, UserLogin, UserLogout,
-                              UserRegis)
+                              UserRegis, VSCodeSettingsHandler)
 
 os.makedirs("logs", exist_ok=True)
 config = ConfigParser()
@@ -66,6 +66,7 @@ application = Application(
         (r'/calc(ulator)?(\.html)?$', CalcPageHandler),
         (r"/chat(room)?(\.html)?$", ChatPageHandler),
         (r"/wsschat$", ChatHandler),
+        (r"/vscode_settings$", VSCodeSettingsHandler),
         (r"/file(s)?(\.html)?$", UploadFileHandler),
         (rf"/{tornado_settings['file_upload_dir']}/(.*\.*[\w\d]+)$",
          DownloadHandler, {

@@ -25,9 +25,14 @@ os.makedirs("logs", exist_ok=True)
 config = ConfigParser()
 config.read("settings.ini")
 tornado_settings = config["tornado server"]
-HOST_NAME = socket.getfqdn(socket.gethostname())
-HOST_IP = socket.gethostbyname(HOST_NAME)
-LOCAL_IP = tornado_settings["local_ip"]
+HOST_IP = LOCAL_IP = tornado_settings["local_ip"]
+
+try:
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    s.connect(('8.8.8.8', 80))
+    HOST_IP = s.getsockname()[0]
+finally:
+    s.close()
 HOST_PORT = tornado_settings.getint("host_port")
 
 userdb_conn = sqlite3.connect("file:logs/users.db3?mode=rwc", uri=True)
@@ -253,6 +258,17 @@ class CalcPageHandler(CheckLoggedMixin, BaseHandler):
         _, logged_in = self.check_login()
         params = {"logged_in": logged_in, "logging_in": False}
         self.render("calc.html", **params)
+
+
+class VSCodeSettingsHandler(CheckLoggedMixin, BaseHandler):
+    """处理 VSCode 配置文件获取请求"""
+    def get(self, *args, **kwargs):
+        _, logged_in = self.check_login()
+        params = {"logged_in": logged_in, "logging_in": False}
+        with open("settings.json", "r", encoding="utf-8") as f:
+            settings_content = f.read()
+        params["settings_content"] = settings_content
+        self.render("show_settings.html", **params)
 
 
 class UploadFileHandler(CheckLoggedMixin, MustLoginMixin, BaseHandler):

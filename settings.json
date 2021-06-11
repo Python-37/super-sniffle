@@ -1,23 +1,26 @@
 {
     // 延伸模组：C/C++、Chinese (Traditional)、indent-rainbow、
     // Jupyter、Markdown Preview Enhanced、Monokai Pro、
-    // Prettier - Code formatter、Python、Pylance、Vim、YAML
-    "typescript.locale": "zh-TW",
-    "workbench.colorTheme": "Monokai Pro (Filter Spectrum)",
-    "workbench.iconTheme": "Monokai Pro (Filter Spectrum) Icons",
+    // Prettier - Code formatter、Python、Vim
+    "workbench.colorTheme": "Monokai Pro (Filter Machine)",
+    "workbench.iconTheme": "Monokai Pro (Filter Machine) Icons",
     "workbench.preferredDarkColorTheme": "Monokai Pro (Filter Machine)",
+    "workbench.editor.wrapTabs": true,
+    "workbench.editor.openPositioning": "first",
+    "workbench.editorAssociations": {
+        "*.ipynb": "jupyter.notebook.ipynb"
+    },
     "window.titleBarStyle": "custom",
     "window.zoomLevel": 0.7,
     "python.linting.pylintEnabled": false,
     "python.linting.mypyEnabled": false,
     "python.linting.flake8Enabled": true,
     "python.linting.flake8Args": [
-        "--max-line-length=90",
+        "--max-line-length=99",
         "--extend-ignore=E701,F403,E502,E731"
     ],
     "python.formatting.provider": "yapf",
     "python.terminal.launchArgs": [],
-    "python.languageServer": "Pylance",
     "python.analysis.autoImportCompletions": false,
     "prettier.tabWidth": 4,
     "editor.formatOnSave": false,
@@ -25,6 +28,11 @@
     "editor.fontLigatures": false,
     "editor.fontSize": 15,
     "editor.fontWeight": 500,
+    "editor.lineNumbers": "on",
+    "editor.cursorStyle": "line",
+    "editor.wordSeparators": "/\\()\"':,.;<>~!@#$%^&*|+=[]{}`?-",
+    "editor.wordWrap": "off",
+    "editor.tabSize": 4,
     "[html]": {
         "editor.defaultFormatter": "esbenp.prettier-vscode"
     },
@@ -43,13 +51,43 @@
     "[typescript]": {
         "editor.defaultFormatter": "esbenp.prettier-vscode"
     },
-    "terminal.integrated.fontFamily": "Consolas, 'Courier New', monospace",
-    "terminal.integrated.automationShell.windows": "",
-    "terminal.integrated.shell.windows": "C:\\Program Files\\PowerShell\\7\\pwsh.exe",
-    "terminal.integrated.inheritEnv": false,
-    "terminal.external.windowsExec": "C:\\Program Files\\PowerShell\\7\\pwsh.exe",
     "files.eol": "\n",
     "[shellscript]": {
         "files.eol": "\n"
-    }
+    },
+    "terminal.integrated.fontFamily": "Consolas, 'Courier New', monospace",
+    "terminal.integrated.automationShell.windows": "",
+    "terminal.integrated.inheritEnv": false,
+    "terminal.external.windowsExec": "C:\\Program Files\\PowerShell\\7\\pwsh.exe",
+    "terminal.integrated.profiles.windows": {
+        "Raw PowerShell": {
+            "source": "PowerShell",
+            "icon": "terminal-powershell"
+        },
+        "PowerShell": {
+            "path": "C:\\Program Files\\PowerShell\\7\\pwsh.exe",
+            "args": [
+                "-ExecutionPolicy",
+                "ByPass",
+                "-NoExit",
+                "-Command",
+                "& 'D:\\Miniconda3\\shell\\condabin\\conda-hook.ps1' ; conda activate 'D:\\Miniconda3'"
+            ],
+            "source": "PowerShell",
+            "icon": "terminal-powershell"
+        },
+        "Command Prompt": {
+            "path": [
+                "${env:windir}\\Sysnative\\cmd.exe",
+                "${env:windir}\\System32\\cmd.exe"
+            ],
+            "args": [],
+            "icon": "terminal-cmd"
+        },
+        "Git Bash": {
+            "source": "Git Bash"
+        }
+    },
+    "terminal.integrated.defaultProfile.windows": "PowerShell",
+    "terminal.integrated.defaultProfile.linux": "zsh"
 }
