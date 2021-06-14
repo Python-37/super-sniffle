@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<!-- 用於在瀏覽器內調試圖像處理算法源碼，110.06.14立項 -->
+<!-- 初步的設計架構為前端使用 xtermjs，後端使用tornado調用OpenCV，中間使用WEBsocket連結 -->
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <title>CV Deom</title>
+        <script src="https://unpkg.com/xterm@4.13.0/lib/xterm.js"></script>
+        <link
+            rel="stylesheet"
+            href="https://unpkg.com/xterm@4.13.0/css/xterm.css"
+        />
+        <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+    </head>
+    <body>
+        <div id="terminal"></div>
+        <script>
+            $(function () {
+                // HACK: This should be window.Terminal once upgraded to 4.0.1
+                var term = new Terminal();
+                term.open(document.getElementById("terminal"));
+
+                function runFakeTerminal() {
+                    if (term._initialized) {
+                        return;
+                    }
+
+                    term._initialized = true;
+
+                    term.prompt = () => {
+                        term.write("\r\n$ ");
+                    };
+
+                    term.writeln("Welcome to xterm.js");
+                    term.writeln("Type some keys and commands to play around.");
+                    term.writeln("");
+                    prompt(term);
+
+                    var curr_line = "";
+                    term.onData((e) => {
+                        const printable =
+                            !e.altKey &&
+                            !e.altGraphKey &&
+                            !e.ctrlKey &&
+                            !e.metaKey;
+                        switch (e) {
+                            case "\r": // Enter
+                                console.log(curr_line);
+                                curr_line = "";
+                            case "\u0003": // Ctrl+C
+                                prompt(term);
+                                curr_line = "";
+                                break;
+                            case "\u007F": // Backspace (DEL)
+                                // Do not delete the prompt
+                                if (term._core.buffer.x > 2) {
+                                    term.write("\b \b");
+                                    curr_line = curr_line.slice(0, -1);
+                                }
+                                break;
+                            default:
+                                // Print all other characters for demo
+                                if (printable) {
+                                    term.write(e);
+                                    curr_line += e;
+                                }
+                        }
+                    });
+                }
+
+                function prompt(term) {
+                    term.write("\r\n$ ");
+                }
+                runFakeTerminal();
+            });
+        </script>
+    </body>
+</html>
