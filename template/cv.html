@@ -1,78 +1,304 @@
-<!DOCTYPE html>
+{% extends "base.html" %}
 <!-- 用於在瀏覽器內調試圖像處理算法源碼，110.06.14立項 -->
 <!-- 初步的設計架構為前端使用 xtermjs，後端使用tornado調用OpenCV，中間使用WEBsocket連結 -->
-<html>
-    <head>
-        <meta charset="UTF-8" />
-        <title>CV Deom</title>
-        <script src="https://unpkg.com/xterm@4.13.0/lib/xterm.js"></script>
-        <link
-            rel="stylesheet"
-            href="https://unpkg.com/xterm@4.13.0/css/xterm.css"
-        />
-        <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
-    </head>
-    <body>
-        <div id="terminal"></div>
-        <script>
-            $(function () {
-                // HACK: This should be window.Terminal once upgraded to 4.0.1
-                var term = new Terminal();
-                term.open(document.getElementById("terminal"));
 
-                function runFakeTerminal() {
-                    if (term._initialized) {
-                        return;
+{% block title %}图像处理算法测试介面{% end %} {% block body %}
+<ul class="nav">
+    <li><a href="/">首页</a></li>
+    <li>
+        <a href="/chat">聊天室</a>
+    </li>
+    <li>
+        <a href="/files">文件上传与下载</a>
+    </li>
+    <li>
+        <a href="/calc">计算器</a>
+    </li>
+    <li>
+        <a href="/vscode_settings">VS Code 配置</a>
+    </li>
+    <li class="active">
+        <a href="/cv">CV 代码测试</a>
+    </li>
+</ul>
+
+<img id="source_img" src="mine.png" alt="" />
+<div>X:<input id="xxx" value="" />Y:<input id="yyy" value="" /></div>
+<div id="terminal"></div>
+{% end %} {% block js %}
+<!-- <script src="https://unpkg.com/xterm@4.13.0/lib/xterm.js"></script> -->
+<script src="js/xterm-4.13.0.js"></script>
+<script>
+    var match_URL_re =
+        "^((https|http|ftp|rtsp|mms)?://)" +
+        "?(([0-9a-z_!~*'().&=+$%-]+: )?[0-9a-z_!~*'().&=+$%-]+@)?" + //ftp的user@
+        "(([0-9]{1,3}.){3}[0-9]{1,3}" + // IP形式的URL- 199.194.52.184
+        "|" + // 允许IP和DOMAIN（域名）
+        "([0-9a-z_!~*'()-]+.)*" + // 域名- www.
+        "([0-9a-z][0-9a-z-]{0,61})?[0-9a-z]." + // 二级域名
+        "[a-z]{2,6})" + // first level domain- .com or .museum
+        "(:[0-9]{1,5})?"; // 端口
+
+    var match_URL_re = new RegExp(match_URL_re);
+    var current_URL = match_URL_re.exec(document.baseURI);
+    function bindEvent(dom, eventName, listener) {
+        if (dom.attachEvent) {
+            dom.attachEvent("on" + eventName, listener);
+        } else {
+            dom.addEventListener(eventName, listener);
+        }
+    }
+    var img_div = document.getElementById("source_img");
+    bindEvent(img_div, "mousemove", function (e) {
+        var offsetX = e.offsetX;
+        var offsetY = e.offsetY;
+        document.getElementById("xxx").value = offsetX;
+        document.getElementById("yyy").value = offsetY;
+        // console.log(offsetX, offsetY);
+    });
+
+    // HACK: This should be window.Terminal once upgraded to 4.0.1
+    // var term = new Terminal();
+    let term = new Terminal({
+        rendererType: "canvas",
+        cursorBlink: true,
+        convertEol: true,
+        scrollback: 800,
+        row: 400,
+        theme: {
+            foreground: "white",
+            background: "#060101",
+        },
+    });
+    term.open(document.getElementById("terminal"));
+
+    function prompt(term) {
+        term.write("\r\n$ ");
+    }
+    var histCommandList = [];
+    var histIndex = 0;
+    var input = "";
+    var prefix = "$";
+    function runTerminal() {
+        if (term._initialized) {
+            return;
+        }
+
+        term._initialized = true;
+
+        // term.prompt = () => {
+        //     term.write("\r\n$ ");
+        // };
+        term.prompt = () => {
+            term.write(prefix);
+        };
+
+        term.writeln("Welcome to xterm.js");
+        term.writeln("Type some keys and commands to play around.");
+        term.writeln("");
+        prompt(term);
+
+        term.onData((ev) => {
+            const printable =
+                !ev.altKey && !ev.altGraphKey && !ev.ctrlKey && !ev.metaKey;
+            // 每行开头前缀长度 @ashinWu:$
+            const threshold = prefix.length;
+            // 总偏移(长度) = 输入+前缀
+            let fixation = input.length + threshold;
+            // 当前x偏移量
+            let offset = term._core.buffer.x;
+            currentOffset = fixation;
+            // 禁用Home、PgUp、PgDn、Ins、Del键
+            if ([36, 33, 34, 45, 46].indexOf(ev) !== -1) return;
+
+            switch (ev) {
+                // 回车键
+                case "\r":
+                    handleInput();
+                    input = "";
+                    break;
+                // 退格键
+                case "\u007f":
+                    if (offset > threshold) {
+                        term._core.buffer.x = offset - 1;
+                        // \x1b[?K: 清除光标至行末的"可清除"字符
+                        term.write("\x1b[?K" + input.slice(offset - threshold));
+                        // 保留原来光标位置
+                        const cursor = bulidData(fixation - offset, "\x1b[D");
+                        term.write(cursor);
+                        input = `${input.slice(
+                            0,
+                            offset - threshold - 1
+                        )}${input.slice(offset - threshold)}`;
                     }
-
-                    term._initialized = true;
-
-                    term.prompt = () => {
-                        term.write("\r\n$ ");
-                    };
-
-                    term.writeln("Welcome to xterm.js");
-                    term.writeln("Type some keys and commands to play around.");
-                    term.writeln("");
-                    prompt(term);
-
-                    var curr_line = "";
-                    term.onData((e) => {
-                        const printable =
-                            !e.altKey &&
-                            !e.altGraphKey &&
-                            !e.ctrlKey &&
-                            !e.metaKey;
-                        switch (e) {
-                            case "\r": // Enter
-                                console.log(curr_line);
-                                curr_line = "";
-                            case "\u0003": // Ctrl+C
-                                prompt(term);
-                                curr_line = "";
-                                break;
-                            case "\u007F": // Backspace (DEL)
-                                // Do not delete the prompt
-                                if (term._core.buffer.x > 2) {
-                                    term.write("\b \b");
-                                    curr_line = curr_line.slice(0, -1);
-                                }
-                                break;
-                            default:
-                                // Print all other characters for demo
-                                if (printable) {
-                                    term.write(e);
-                                    curr_line += e;
-                                }
+                    break;
+                case "\u001b[F":
+                    const cursor = bulidData(fixation - offset, "\x1b[C");
+                    term.write(cursor);
+                    break;
+                // 方向盘上键
+                case "\u001b[A":
+                    if (histCommandList[histIndex - 1]) {
+                        // 将光标重置到末端
+                        term._core.buffer.x = fixation;
+                        let b1 = "",
+                            b2 = "",
+                            b3 = "";
+                        // 构造退格(模拟替换效果) \b \b标识退一格; \b\b  \b\b表示退两格...
+                        for (let i = 0; i < input.length; i++) {
+                            b1 = b1 + "\b";
+                            b2 = b2 + " ";
+                            b3 = b3 + "\b";
                         }
-                    });
-                }
+                        term.write(b1 + b2 + b3);
+                        input = histCommandList[histIndex - 1];
+                        term.write(histCommandList[histIndex - 1]);
+                        histIndex--;
+                    }
+                    break;
+                // 方向盘下键
+                case "\u001b[B":
+                    if (histCommandList[histIndex + 1]) {
+                        // 将光标重置到末端
+                        term._core.buffer.x = fixation;
+                        let b1 = "",
+                            b2 = "",
+                            b3 = "";
+                        // 构造退格(模拟替换效果) \b \b标识退一格; \b\b  \b\b表示退两格...
+                        for (
+                            let i = 0;
+                            i < histCommandList[histIndex].length;
+                            i++
+                        ) {
+                            b1 = b1 + "\b";
+                            b2 = b2 + " ";
+                            b3 = b3 + "\b";
+                        }
+                        input = histCommandList[histIndex + 1];
+                        term.write(b1 + b2 + b3);
+                        term.write(histCommandList[histIndex + 1]);
+                        histIndex++;
+                    }
+                    break;
+                // 方向盘左键
+                case "\u001b[D":
+                    if (offset > threshold) {
+                        term.write(ev);
+                    }
+                    break;
+                // 方向盘右键
+                case "\u001b[C":
+                    if (offset < fixation) {
+                        term.write(ev);
+                    }
+                    break;
+                default:
+                    if (printable) {
+                        // 限制输入最大长度 防止换行bug
+                        if (fixation >= term.cols) return;
 
-                function prompt(term) {
-                    term.write("\r\n$ ");
+                        // 不在末尾插入时 要拼接
+                        if (offset < fixation) {
+                            term.write(
+                                "\x1b[?K" +
+                                    `${ev}${input.slice(offset - threshold)}`
+                            );
+                            const cursor = bulidData(
+                                fixation - offset,
+                                "\x1b[D"
+                            );
+                            term.write(cursor);
+                            input = `${input.slice(
+                                0,
+                                offset - threshold
+                            )}${ev}${input.slice(offset - threshold)}`;
+                        } else {
+                            term.write(ev);
+                            input += ev;
+                        }
+                        histIndex = histCommandList.length;
+                    }
+                    break;
+            }
+        });
+
+        term.attachCustomKeyEventHandler(function (ev) {
+            // curl+v
+            if (ev.keyCode === 86 && ev.ctrlKey) {
+                const inline = currentOffset + copy.length >= term.cols;
+                if (inline) return;
+                if (copy) {
+                    term.write(copy);
+                    input += copy;
                 }
-                runFakeTerminal();
-            });
-        </script>
-    </body>
-</html>
+            }
+        });
+    }
+    // 在这里处理自定义输入...
+    function handleInput() {
+        // 判断空值
+        term.write("\r\n");
+        if (input.trim()) {
+            // 记录历史命令
+            if (histCommandList[histCommandList.length - 1] !== input) {
+                histCommandList.push(input);
+                histIndex = histCommandList.length;
+            }
+            const command = input.trim().split(" ");
+            // 可限制可用命令
+            // 这里进行socket交互
+            switch (command[0]) {
+                case "help":
+                    term.writeln(
+                        "\x1b[40;33;1m\nthis is a web terminal demo based on xterm!\x1b[0m\n此demo模拟shell上下左右和退格键效果\n"
+                    );
+                    break;
+                default:
+                    term.writeln(input);
+                    Socket.send(input);
+                    break;
+            }
+        }
+        term.prompt();
+    }
+
+    function bulidData(length, subString) {
+        let cursor = "";
+        for (let i = 0; i < length; i++) {
+            cursor += subString;
+        }
+        return cursor;
+    }
+
+    if ("WebSocket" in window) {
+        /*判断浏览器是否支持WebSocket接口*/
+        /*创建创建 WebSocket 对象，协议本身使用新的ws://URL格式*/
+        var Socket = new WebSocket(
+            "ws://" + current_URL[0].replace(current_URL[1], "") + "/wsscv"
+        );
+        /*连接建立时触发*/
+        Socket.onopen = function () {
+            console.log("Connected!");
+        };
+        /*客户端接收服务端数据时触发*/
+        Socket.onmessage = function (ev) {
+            var received_msg = ev.data; /*接受消息*/
+            var obj = JSON.parse(received_msg);
+            if (obj.hasOwnProperty("img")) {
+                img_div.src = "data:image/png;base64," + obj.img;
+            }
+            console.log(obj);
+        };
+        /*连接关闭时触发*/
+        Socket.onclose = function () {
+            console.log("Disconnected");
+        };
+    } else {
+        /*浏览器不支持 WebSocket*/
+        alert("您的浏览器不支持 WebSocket!");
+    }
+    runTerminal();
+</script>
+{% end %} {% block css %}
+<link rel="stylesheet" href="css/xterm-4.13.0.css" />
+{% end %}

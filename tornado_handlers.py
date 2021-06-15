@@ -3,11 +3,14 @@
 __version__ = 1 + 1e-1 + 1j
 __author__ = "Bavon C. K. Chao (赵庆华)"
 
+import base64
 import datetime
 import hashlib
 import hmac
+import json
 import os
 import os.path as opth
+import re
 import socket
 import sqlite3
 import time
@@ -20,6 +23,12 @@ from tornado.escape import utf8
 from tornado.log import logging as t_logging
 from tornado.web import HTTPError, RequestHandler, authenticated
 from tornado.websocket import WebSocketHandler
+
+try:
+    import cv2
+    import numpy as np
+except ImportError:
+    cv2 = np = None
 
 os.makedirs("logs", exist_ok=True)
 config = ConfigParser()
@@ -258,6 +267,58 @@ class CalcPageHandler(CheckLoggedMixin, BaseHandler):
         _, logged_in = self.check_login()
         params = {"logged_in": logged_in, "logging_in": False}
         self.render("calc.html", **params)
+
+
+class CVPageHandler(CheckLoggedMixin, BaseHandler):
+    """处理聊天室网页内容显示"""
+    def get(self, *args, **kwargs):
+        _, logged_in = self.check_login()
+        params = {"logged_in": logged_in, "logging_in": False}
+        self.render("cv.html", **params)
+
+
+class CVHandler(CheckLoggedMixin, WebSocketHandler):
+    LOCAL_ADDR = f"{LOCAL_IP}:{HOST_PORT}"
+    HOST_ADDR = f"{HOST_IP}:{HOST_PORT}"
+
+    def open(self):
+        super().open()
+        self.img = None
+        if cv2 is None:
+            self.write_message({"msg": "You didn't install OpenCV"})
+            self.close(500)
+        else:
+            self.write_message({"msg": "Server connected!"})
+
+    def return_img(self):
+        _, resp_img = cv2.imencode(".png", self.img)
+        resp_img = base64.b64encode(resp_img).decode()
+        resp = {"img": resp_img}
+        resp = json.dumps(resp)
+        self.write_message(resp)
+
+    def on_message(self, message):
+        read_img = re.search(r"imread\([\'\"](?P<path>.*?)[\'\"]\)", message)
+        if read_img is not None:
+            img_path = read_img.groupdict()["path"]
+            self.img = cv2.imdecode(np.fromfile(img_path, dtype=np.uint8),
+                                    cv2.IMREAD_COLOR)
+            self.return_img()
+        print(message)
+
+    def on_close(self):
+        pass
+
+    def check_origin(self, origin):
+        # 接受所有跨源流量
+        # return True
+        # 允许来自站点子域的连接
+        parsed_origin = urllib.parse.urlparse(origin)
+        net_loc = parsed_origin.netloc
+        if net_loc.endswith(self.LOCAL_ADDR) or net_loc.endswith(
+                self.HOST_ADDR):
+            return True
+        return False
 
 
 class VSCodeSettingsHandler(CheckLoggedMixin, BaseHandler):

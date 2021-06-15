@@ -20,9 +20,9 @@ from tornado.options import options as t_options
 from tornado.web import Application, StaticFileHandler
 
 from tornado_handlers import (BaseHandler, CalcPageHandler, ChatHandler,
-                              ChatPageHandler, CheckLoggedMixin,
-                              UploadFileHandler, UserLogin, UserLogout,
-                              UserRegis, VSCodeSettingsHandler)
+                              ChatPageHandler, CheckLoggedMixin, CVHandler,
+                              CVPageHandler, UploadFileHandler, UserLogin,
+                              UserLogout, UserRegis, VSCodeSettingsHandler)
 
 os.makedirs("logs", exist_ok=True)
 config = ConfigParser()
@@ -66,6 +66,8 @@ application = Application(
         (r'/calc(ulator)?(\.html)?$', CalcPageHandler),
         (r"/chat(room)?(\.html)?$", ChatPageHandler),
         (r"/wsschat$", ChatHandler),
+        (r"/cv$", CVPageHandler),
+        (r"/wsscv$", CVHandler),
         (r"/vscode_settings$", VSCodeSettingsHandler),
         (r"/file(s)?(\.html)?$", UploadFileHandler),
         (rf"/{tornado_settings['file_upload_dir']}/(.*\.*[\w\d]+)$",
