@@ -23,6 +23,7 @@
 </ul>
 
 <img id="source_img" src="mine.png" alt="" />
+<p id="mjs_tip" style="display: none"></p>
 <div>X:<input id="xxx" value="" />Y:<input id="yyy" value="" /></div>
 <div id="terminal"></div>
 {% end %} {% block js %}
@@ -50,11 +51,29 @@
     }
     var img_div = document.getElementById("source_img");
     bindEvent(img_div, "mousemove", function (e) {
-        var offsetX = e.offsetX;
-        var offsetY = e.offsetY;
-        document.getElementById("xxx").value = offsetX;
-        document.getElementById("yyy").value = offsetY;
-        // console.log(offsetX, offsetY);
+        document.getElementById("xxx").value = e.offsetX;
+        document.getElementById("yyy").value = e.offsetY;
+        var x, y;
+        var mouse = {
+            x:
+                e.clientX +
+                document.body.scrollLeft +
+                document.documentElement.scrollLeft,
+            y:
+                e.clientY +
+                document.body.scrollTop +
+                document.documentElement.scrollTop,
+        };
+        tip_zone = document.getElementById("mjs_tip");
+        tip_zone.style.left = mouse.x + 10 + "px";
+        tip_zone.style.top = mouse.y + 10 + "px";
+        tip_zone.innerHTML = "X:" + e.offsetX + ";Y:" + e.offsetY;
+        tip_zone.style.display = "";
+    });
+
+    bindEvent(img_div, "mouseout", function () {
+        tip_zone = document.getElementById("mjs_tip");
+        tip_zone.style.display = "none";
     });
 
     // HACK: This should be window.Terminal once upgraded to 4.0.1
@@ -86,9 +105,6 @@
 
         term._initialized = true;
 
-        // term.prompt = () => {
-        //     term.write("\r\n$ ");
-        // };
         term.prompt = () => {
             term.write(prefix);
         };
@@ -96,7 +112,7 @@
         term.writeln("Welcome to xterm.js");
         term.writeln("Type some keys and commands to play around.");
         term.writeln("");
-        prompt(term);
+        term.prompt();
 
         term.onData((ev) => {
             const printable =
@@ -109,13 +125,24 @@
             let offset = term._core.buffer.x;
             currentOffset = fixation;
             // 禁用Home、PgUp、PgDn、Ins、Del键
-            if ([36, 33, 34, 45, 46].indexOf(ev) !== -1) return;
-
+            if (
+                [
+                    "\u001b[H",
+                    "\u001b[5~",
+                    "\u001b[6~",
+                    "\u001b[2~",
+                    "\u001b[3~",
+                ].indexOf(ev) !== -1
+            )
+                return;
             switch (ev) {
                 // 回车键
                 case "\r":
-                    handleInput();
+                    handleInput("run");
                     input = "";
+                    break;
+                case "\t":
+                    handleInput("completion");
                     break;
                 // 退格键
                 case "\u007f":
@@ -132,6 +159,7 @@
                         )}${input.slice(offset - threshold)}`;
                     }
                     break;
+                // End 键
                 case "\u001b[F":
                     const cursor = bulidData(fixation - offset, "\x1b[C");
                     term.write(cursor);
@@ -235,7 +263,7 @@
         });
     }
     // 在这里处理自定义输入...
-    function handleInput() {
+    function handleInput(mode) {
         // 判断空值
         term.write("\r\n");
         if (input.trim()) {
@@ -250,12 +278,17 @@
             switch (command[0]) {
                 case "help":
                     term.writeln(
-                        "\x1b[40;33;1m\nthis is a web terminal demo based on xterm!\x1b[0m\n此demo模拟shell上下左右和退格键效果\n"
+                        "\x1b[40;33;1m\nthis is a web terminal demo based on xterm!\x1b[0m"
                     );
+                    term.writeln("cv2.xxx");
+                    term.writeln("np.xxx");
+                    term.writeln("imread(xxx)");
+                    term.writeln("Use tab to get completion tips");
                     break;
                 default:
-                    term.writeln(input);
-                    Socket.send(input);
+                    msg = { mode: mode, code: input };
+                    msg = JSON.stringify(msg);
+                    Socket.send(msg);
                     break;
             }
         }
@@ -278,7 +311,8 @@
         );
         /*连接建立时触发*/
         Socket.onopen = function () {
-            console.log("Connected!");
+            term.writeln("Server connected!");
+            term.prompt();
         };
         /*客户端接收服务端数据时触发*/
         Socket.onmessage = function (ev) {
@@ -287,11 +321,23 @@
             if (obj.hasOwnProperty("img")) {
                 img_div.src = "data:image/png;base64," + obj.img;
             }
+            if (obj.hasOwnProperty("mode")) {
+                if (obj.mode == "completion") {
+                    for (let i = 0; i < obj.res.length; i++) {
+                        term.write(obj.res[i] + "\t");
+                    }
+                    term.writeln("");
+                    term.prompt();
+                    term.write(input);
+                } else if (obj.mode == "run") {
+                    term.prompt();
+                }
+            }
             console.log(obj);
         };
         /*连接关闭时触发*/
         Socket.onclose = function () {
-            console.log("Disconnected");
+            term.writeln("Server disconnected!");
         };
     } else {
         /*浏览器不支持 WebSocket*/
@@ -301,4 +347,18 @@
 </script>
 {% end %} {% block css %}
 <link rel="stylesheet" href="css/xterm-4.13.0.css" />
+<style>
+    #mjs_tip {
+        position: absolute;
+        left: 0;
+        top: 0;
+        background-color: deepskyblue;
+        fill: crimson;
+        stroke: white;
+        stroke-width: 8px;
+        font-size: 18px;
+        font-weight: bold;
+        paint-order: stroke;
+    }
+</style>
 {% end %}

@@ -27,6 +27,9 @@ from tornado.websocket import WebSocketHandler
 try:
     import cv2
     import numpy as np
+
+    cv2_attrs = vars(cv2).keys()
+    np_attrs = vars(np).keys()
 except ImportError:
     cv2 = np = None
 
@@ -278,6 +281,12 @@ class CVPageHandler(CheckLoggedMixin, BaseHandler):
 
 
 class CVHandler(CheckLoggedMixin, WebSocketHandler):
+    """
+    前后端交互方式:json
+    mode字段表示何种行为,run运行;completion补全
+    img字段base64编码的图片
+    msg字段其他信息
+    """
     LOCAL_ADDR = f"{LOCAL_IP}:{HOST_PORT}"
     HOST_ADDR = f"{HOST_IP}:{HOST_PORT}"
 
@@ -293,17 +302,39 @@ class CVHandler(CheckLoggedMixin, WebSocketHandler):
     def return_img(self):
         _, resp_img = cv2.imencode(".png", self.img)
         resp_img = base64.b64encode(resp_img).decode()
-        resp = {"img": resp_img}
+        resp = {"mode": "run", "img": resp_img}
         resp = json.dumps(resp)
         self.write_message(resp)
 
     def on_message(self, message):
-        read_img = re.search(r"imread\([\'\"](?P<path>.*?)[\'\"]\)", message)
-        if read_img is not None:
-            img_path = read_img.groupdict()["path"]
-            self.img = cv2.imdecode(np.fromfile(img_path, dtype=np.uint8),
-                                    cv2.IMREAD_COLOR)
-            self.return_img()
+        message = json.loads(message)
+        if message["mode"] == "run":
+            read_img = re.search(r"imread\([\'\"](?P<path>.*?)[\'\"]\)",
+                                 message["code"])
+            if read_img is not None:
+                img_path = read_img.groupdict()["path"]
+                self.img = cv2.imdecode(np.fromfile(img_path, dtype=np.uint8),
+                                        cv2.IMREAD_COLOR)
+                self.return_img()
+        elif message["mode"] == "completion":
+            recv_code = message["code"]
+            match_cv2 = re.search(r"^cv2\.(?P<func>[^\(\[]*)?.*$", recv_code)
+            if match_cv2 is not None:
+                func_name = match_cv2.groupdict()["func"]
+                cmp_item = filter(lambda item: item.startswith(func_name),
+                                  cv2_attrs)
+                cmp_item = list(cmp_item)
+                resp = {"mode": "completion", "res": cmp_item}
+                self.write_message(json.dumps(resp))
+            match_np = re.search(r"^np\.(?P<func>[^\(\[]*)?.*$", recv_code)
+            if match_np is not None:
+                func_name = match_np.groupdict()["func"]
+                cmp_item = filter(lambda item: item.startswith(func_name),
+                                  np_attrs)
+                cmp_item = list(cmp_item)
+                resp = {"mode": "completion", "res": cmp_item}
+                self.write_message(json.dumps(resp))
+        # TODO 添加执行代码功能
         print(message)
 
     def on_close(self):
