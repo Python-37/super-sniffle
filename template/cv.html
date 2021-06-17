@@ -142,7 +142,16 @@
                     input = "";
                     break;
                 case "\t":
-                    handleInput("completion");
+                    // 获取当前光标位置以前的内容
+                    var func_re = /[a-zA-Z_][a-zA-Z0-9_]*\.[^\(\[]+$/;
+                    var incmp_code = input.slice(0, offset - threshold);
+                    incmp_code = func_re.exec(incmp_code);
+                    if (incmp_code != null) {
+                        code = incmp_code[0];
+                        msg = { mode: "completion", code: code };
+                        msg = JSON.stringify(msg);
+                        Socket.send(msg);
+                    }
                     break;
                 // 退格键
                 case "\u007f":
@@ -311,8 +320,8 @@
         );
         /*连接建立时触发*/
         Socket.onopen = function () {
-            term.writeln("Server connected!");
-            term.prompt();
+            console.log("Server connected!");
+            // term.prompt();
         };
         /*客户端接收服务端数据时触发*/
         Socket.onmessage = function (ev) {
@@ -321,15 +330,25 @@
             if (obj.hasOwnProperty("img")) {
                 img_div.src = "data:image/png;base64," + obj.img;
             }
+            if (obj.hasOwnProperty("msg")) {
+                term.writeln(obj["msg"]);
+                term.write(input);
+                term.prompt();
+            }
             if (obj.hasOwnProperty("mode")) {
-                if (obj.mode == "completion") {
-                    for (let i = 0; i < obj.res.length; i++) {
-                        term.write(obj.res[i] + "\t");
+                if (obj.mode == "completion" && obj.hasOwnProperty("res")) {
+                    if (obj.res.length > 0) {
+                        term.writeln("");
+                        for (let i = 0; i < obj.res.length; i++) {
+                            term.write(obj.res[i] + "\t");
+                        }
+                        term.writeln("");
+                        term.prompt();
+                        term.write(input);
                     }
+                } else if (obj.mode == "run" && obj.hasOwnProperty("res")) {
                     term.writeln("");
-                    term.prompt();
-                    term.write(input);
-                } else if (obj.mode == "run") {
+                    term.writeln(obj.res);
                     term.prompt();
                 }
             }

@@ -8,6 +8,7 @@ import datetime
 import hashlib
 import hmac
 import json
+import logging
 import os
 import os.path as opth
 import re
@@ -16,7 +17,7 @@ import sqlite3
 import time
 import urllib
 from configparser import ConfigParser
-from typing import Tuple, Union
+from typing import Any, NoReturn, Tuple, Union
 
 import tornado
 from tornado.escape import utf8
@@ -27,9 +28,6 @@ from tornado.websocket import WebSocketHandler
 try:
     import cv2
     import numpy as np
-
-    cv2_attrs = vars(cv2).keys()
-    np_attrs = vars(np).keys()
 except ImportError:
     cv2 = np = None
 
@@ -38,6 +36,8 @@ config = ConfigParser()
 config.read("settings.ini")
 tornado_settings = config["tornado server"]
 HOST_IP = LOCAL_IP = tornado_settings["local_ip"]
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
 
 try:
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -292,50 +292,87 @@ class CVHandler(CheckLoggedMixin, WebSocketHandler):
 
     def open(self):
         super().open()
-        self.img = None
         if cv2 is None:
             self.write_message({"msg": "You didn't install OpenCV"})
             self.close(500)
         else:
+            self.__loc = {"cv2": cv2, "np": np, "img": None, "_": None}
+            exec("", self.__loc)
             self.write_message({"msg": "Server connected!"})
 
     def return_img(self):
-        _, resp_img = cv2.imencode(".png", self.img)
+        img = self.__loc["img"]
+        _, resp_img = cv2.imencode(".png", img)
         resp_img = base64.b64encode(resp_img).decode()
         resp = {"mode": "run", "img": resp_img}
         resp = json.dumps(resp)
         self.write_message(resp)
 
+    def __run_code(self, recv_code: str) -> NoReturn:
+        try:
+            recv_code = compile(recv_code, "<string>", "exec")
+            exec(recv_code, self.__loc)
+        except Exception as err:
+            resp = {"mode": "run", "msg": str(err)}
+            resp = json.dumps(resp)
+            self.write_message(resp)
+            return None
+        else:
+            if self.__loc["img"] is not None:
+                self.return_img()
+
+    def __eval_code(self, recv_code: str) -> Any:
+        try:
+            recv_code = compile(recv_code, "<string>", "eval")
+            res = eval(recv_code, self.__loc)
+        except Exception as err:
+            resp = {"mode": "run", "msg": str(err)}
+            resp = json.dumps(resp)
+            self.write_message(resp)
+            return None
+        else:
+            return res
+
     def on_message(self, message):
+        logger.info(message)
         message = json.loads(message)
         if message["mode"] == "run":
+            recv_code = message["code"]
             read_img = re.search(r"imread\([\'\"](?P<path>.*?)[\'\"]\)",
-                                 message["code"])
+                                 recv_code)
             if read_img is not None:
                 img_path = read_img.groupdict()["path"]
-                self.img = cv2.imdecode(np.fromfile(img_path, dtype=np.uint8),
-                                        cv2.IMREAD_COLOR)
-                self.return_img()
+                recv_code = f"img = cv2.imdecode(np.fromfile(r\"{img_path}\"" \
+                    ", dtype=np.uint8), cv2.IMREAD_COLOR)"
+                self.__run_code(recv_code)
+            elif "(" not in recv_code:
+                # 审查元素
+                res = self.__eval_code(recv_code)
+                if res is not None:
+                    resp = {"mode": "run", "res": repr(res)}
+                    self.write_message(json.dumps(resp))
+            else:
+                self.__run_code(recv_code)
+
         elif message["mode"] == "completion":
             recv_code = message["code"]
-            match_cv2 = re.search(r"^cv2\.(?P<func>[^\(\[]*)?.*$", recv_code)
-            if match_cv2 is not None:
-                func_name = match_cv2.groupdict()["func"]
-                cmp_item = filter(lambda item: item.startswith(func_name),
-                                  cv2_attrs)
-                cmp_item = list(cmp_item)
+            recv_code = re.split(r"\.", recv_code)
+            builtin_item = self.__loc["__builtins__"].keys()
+            cmp_item = filter(lambda item: item.startswith(recv_code[0]),
+                              builtin_item)
+            cmp_item = list(cmp_item)
+            if cmp_item:
                 resp = {"mode": "completion", "res": cmp_item}
                 self.write_message(json.dumps(resp))
-            match_np = re.search(r"^np\.(?P<func>[^\(\[]*)?.*$", recv_code)
-            if match_np is not None:
-                func_name = match_np.groupdict()["func"]
-                cmp_item = filter(lambda item: item.startswith(func_name),
-                                  np_attrs)
-                cmp_item = list(cmp_item)
-                resp = {"mode": "completion", "res": cmp_item}
-                self.write_message(json.dumps(resp))
-        # TODO 添加执行代码功能
-        print(message)
+            elif recv_code[0] in self.__loc:
+                code_prefix = ".".join(recv_code[:-1])
+                cmp_item = self.__eval_code(f"dir({code_prefix})")
+                if cmp_item is not None:
+                    cmp_item = filter(
+                        lambda item: item.startswith(recv_code[-1]), cmp_item)
+                    cmp_item = list(cmp_item)
+                    resp = {"mode": "completion", "res": cmp_item}
+                    self.write_message(json.dumps(resp))
 
     def on_close(self):
         pass
