@@ -11,10 +11,12 @@ import json
 import logging
 import os
 import os.path as opth
+import pydoc
 import re
 import socket
 import sqlite3
 import time
+import traceback
 import urllib
 from configparser import ConfigParser
 from typing import Any, NoReturn, Tuple, Union
@@ -296,15 +298,28 @@ class CVHandler(CheckLoggedMixin, WebSocketHandler):
             self.write_message({"msg": "You didn't install OpenCV"})
             self.close(500)
         else:
-            self.__loc = {"cv2": cv2, "np": np, "img": None, "_": None}
+            self.__loc = {
+                "cv2": cv2,
+                "np": np,
+                "img": None,
+                "_": None,
+                "pydoc": pydoc,
+            }
             exec("", self.__loc)
             self.write_message({"msg": "Server connected!"})
 
-    def return_img(self):
-        img = self.__loc["img"]
-        _, resp_img = cv2.imencode(".png", img)
-        resp_img = base64.b64encode(resp_img).decode()
-        resp = {"mode": "run", "img": resp_img}
+    def return_img(self, which_img: str = ""):
+        arg_name = which_img if which_img else "img"
+        img = self.__loc.get(arg_name)
+        if img is not None:
+            _, resp_img = cv2.imencode(".png", img)
+            resp_img = base64.b64encode(resp_img).decode()
+            resp = {"mode": "run", "img": resp_img}
+        else:
+            resp = {
+                "mode": "run",
+                "msg": f"There is not an argument named {which_img}"
+            }
         resp = json.dumps(resp)
         self.write_message(resp)
 
@@ -313,7 +328,9 @@ class CVHandler(CheckLoggedMixin, WebSocketHandler):
             recv_code = compile(recv_code, "<string>", "exec")
             exec(recv_code, self.__loc)
         except Exception as err:
-            resp = {"mode": "run", "msg": str(err)}
+            logger.debug(err)
+            errmsg = traceback.format_exc()
+            resp = {"mode": "run", "msg": errmsg}
             resp = json.dumps(resp)
             self.write_message(resp)
             return None
@@ -326,7 +343,9 @@ class CVHandler(CheckLoggedMixin, WebSocketHandler):
             recv_code = compile(recv_code, "<string>", "eval")
             res = eval(recv_code, self.__loc)
         except Exception as err:
-            resp = {"mode": "run", "msg": str(err)}
+            logger.debug(err)
+            errmsg = traceback.format_exc()
+            resp = {"mode": "run", "msg": errmsg}
             resp = json.dumps(resp)
             self.write_message(resp)
             return None
@@ -338,13 +357,26 @@ class CVHandler(CheckLoggedMixin, WebSocketHandler):
         message = json.loads(message)
         if message["mode"] == "run":
             recv_code = message["code"]
-            read_img = re.search(r"imread\([\'\"](?P<path>.*?)[\'\"]\)",
-                                 recv_code)
-            if read_img is not None:
-                img_path = read_img.groupdict()["path"]
-                recv_code = f"img = cv2.imdecode(np.fromfile(r\"{img_path}\"" \
-                    ", dtype=np.uint8), cv2.IMREAD_COLOR)"
-                self.__run_code(recv_code)
+            builtin_func = re.search(
+                r"(?P<func>imread|help|show)\((?P<arg>.+)\)", recv_code)
+            if builtin_func is not None:
+                func_info = builtin_func.groupdict()
+                func_type = func_info["func"]
+                func_arg = func_info["arg"]
+                if func_type == "imread":
+                    recv_code = "img = cv2.imdecode(np.fromfile(r" \
+                        f"\"{func_arg}\", dtype=np.uint8), cv2.IMREAD_COLOR)"
+                    self.__run_code(recv_code)
+                elif func_type == "help":
+                    recv_code = f"pydoc.render_doc({func_arg}, " \
+                        "renderer=pydoc.plaintext)"
+                    res = self.__eval_code(recv_code)
+                    if res is not None:
+                        res = res if isinstance(res, (str, )) else repr(res)
+                        resp = {"mode": "run", "res": res}
+                        self.write_message(json.dumps(resp))
+                elif func_type == "show":
+                    self.return_img(func_arg)
             elif "(" not in recv_code:
                 # 审查元素
                 res = self.__eval_code(recv_code)
