@@ -298,7 +298,9 @@ class CVHandler(CheckLoggedMixin, WebSocketHandler):
             self.close(500)
         else:
             self.__loc = {}
-            exec("from cv_env_init import *", self.__loc)
+            with open("cv_env_init.py", "r", encoding="utf-8") as f:
+                cv_env_init = compile(f.read(), "cv_env_init.py", "exec")
+            exec(cv_env_init, self.__loc)
             self.write_message({"msg": "Server connected!"})
 
     def return_img(self, which_img: str = ""):
