@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-__version__ = 1 + 2e-1 + 1j
+__version__ = 1 + 2e-1 + 2j
 __author__ = "Bavon C. K. Chao (赵庆华)"
 
 import base64
@@ -328,14 +328,15 @@ class CVHandler(CheckLoggedMixin, WebSocketHandler):
             self.write_message(resp)
             return None
         else:
-            if self.__loc["img"] is not None:
-                self.return_img()
+            self.return_img()
 
-    def __eval_code(self, recv_code: str) -> Any:
+    def __eval_code(self, recv_code: str, trying: bool = False) -> Any:
         try:
             recv_code = compile(recv_code, "<string>", "eval")
             res = eval(recv_code, self.__loc)
         except Exception as err:
+            if trying:
+                raise RuntimeError
             logger.debug(err)
             errmsg = traceback.format_exc()
             resp = {"mode": "run", "msg": errmsg}
@@ -357,8 +358,7 @@ class CVHandler(CheckLoggedMixin, WebSocketHandler):
                 func_type = func_info["func"]
                 func_arg = func_info["arg"]
                 if func_type == "imread":
-                    recv_code = "img = cv2.imdecode(np.fromfile(r" \
-                        f"\"{func_arg}\", dtype=np.uint8), cv2.IMREAD_COLOR)"
+                    recv_code = f"""img = imread(r"{func_arg}")"""
                     self.__run_code(recv_code)
                 elif func_type == "help":
                     recv_code = f"pydoc.render_doc({func_arg}, " \
@@ -370,14 +370,14 @@ class CVHandler(CheckLoggedMixin, WebSocketHandler):
                         self.write_message(json.dumps(resp))
                 elif func_type == "show":
                     self.return_img(func_arg)
-            elif "(" not in recv_code:
-                # 审查元素
-                res = self.__eval_code(recv_code)
-                if res is not None:
-                    resp = {"mode": "run", "res": repr(res)}
-                    self.write_message(json.dumps(resp))
             else:
-                self.__run_code(recv_code)
+                try:
+                    res = self.__eval_code(recv_code, trying=True)
+                    if res is not None:
+                        resp = {"mode": "run", "res": repr(res)}
+                        self.write_message(json.dumps(resp))
+                except Exception:
+                    self.__run_code(recv_code)
 
         elif message["mode"] == "completion":
             recv_code = message["code"]

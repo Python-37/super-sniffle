@@ -27,3 +27,10 @@ def complete(code_str: str) -> list:
             res.append(buff)
             i += 1
     return res
+
+
+def imread(file_path):
+    # global img
+    img = np.fromfile(file_path, dtype=np.uint8)
+    img = cv2.imdecode(img, cv2.IMREAD_COLOR)
+    return img
