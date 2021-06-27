@@ -13,10 +13,10 @@ import numpy as np
 from numpy import pi
 
 try:
-    util_classes = importlib.import_module(".utis", __package__)
-    DecoratorBaseClass = util_classes.DecoratorBaseClass
+    util_classes = importlib.import_module("..utils", __package__)
+    DecoratorBaseClass = util_classes.utils.DecoratorBaseClass
 except (ImportError, TypeError):
-    from utils import DecoratorBaseClass
+    from utils.utils import DecoratorBaseClass
 
 
 def collinear_point_by_distance(point1: np.ndarray, point2: np.ndarray,

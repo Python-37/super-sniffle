@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-__version__ = 1 + 1e-1 + 1j
+__version__ = 1 + 2e-1 + 1j
 __author__ = "Bavon C. K. Chao (赵庆华)"
 
 import base64
@@ -11,7 +11,6 @@ import json
 import logging
 import os
 import os.path as opth
-import pydoc
 import re
 import socket
 import sqlite3
@@ -298,14 +297,8 @@ class CVHandler(CheckLoggedMixin, WebSocketHandler):
             self.write_message({"msg": "You didn't install OpenCV"})
             self.close(500)
         else:
-            self.__loc = {
-                "cv2": cv2,
-                "np": np,
-                "img": None,
-                "_": None,
-                "pydoc": pydoc,
-            }
-            exec("", self.__loc)
+            self.__loc = {}
+            exec("from cv_env_init import *", self.__loc)
             self.write_message({"msg": "Server connected!"})
 
     def return_img(self, which_img: str = ""):
@@ -388,23 +381,12 @@ class CVHandler(CheckLoggedMixin, WebSocketHandler):
 
         elif message["mode"] == "completion":
             recv_code = message["code"]
-            recv_code = re.split(r"\.", recv_code)
-            builtin_item = self.__loc["__builtins__"].keys()
-            cmp_item = filter(lambda item: item.startswith(recv_code[0]),
-                              builtin_item)
-            cmp_item = list(cmp_item)
-            if cmp_item:
-                resp = {"mode": "completion", "res": cmp_item}
-                self.write_message(json.dumps(resp))
-            elif recv_code[0] in self.__loc:
-                code_prefix = ".".join(recv_code[:-1])
-                cmp_item = self.__eval_code(f"dir({code_prefix})")
-                if cmp_item is not None:
-                    cmp_item = filter(
-                        lambda item: item.startswith(recv_code[-1]), cmp_item)
-                    cmp_item = list(cmp_item)
-                    resp = {"mode": "completion", "res": cmp_item}
-                    self.write_message(json.dumps(resp))
+            try:
+                rlc_res = self.__eval_code(f"complete(\"{recv_code}\")")
+            except Exception:
+                rlc_res = []
+            resp = {"mode": "completion", "res": rlc_res}
+            self.write_message(json.dumps(resp))
 
     def on_close(self):
         pass
