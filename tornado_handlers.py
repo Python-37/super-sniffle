@@ -84,6 +84,14 @@ class BaseHandler(RequestHandler):
     def post(self, *args, **kwargs):
         self.set_header('Content-type', 'application/json;charset=UTF-8')
 
+    def write(self,
+              chunk: Union[str, bytes, dict],
+              ensure_json: bool = True) -> None:
+        """write 字典时自动转换成 json"""
+        if ensure_json and isinstance(chunk, (dict, )):
+            chunk = json.dumps(chunk, ensure_ascii=False)
+        return super().write(chunk)
+
 
 class MustLoginMixin:
     """支持根据登录状态鉴权的混入类"""

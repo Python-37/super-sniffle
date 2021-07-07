@@ -13,11 +13,11 @@ import signal
 import time
 from configparser import ConfigParser
 
-import tornado
+import tornado  # noqa
 from tornado.ioloop import IOLoop
 from tornado.log import logging as t_logging
 from tornado.options import options as t_options
-from tornado.web import Application, StaticFileHandler
+from tornado.web import Application, Finish, HTTPError, StaticFileHandler
 
 from tornado_handlers import (BaseHandler, CalcPageHandler, ChatHandler,
                               ChatPageHandler, CheckLoggedMixin, CVHandler,
@@ -29,6 +29,7 @@ config = ConfigParser()
 config.read("settings.ini")
 tornado_settings = config["tornado server"]
 HOST_PORT = tornado_settings.getint("host_port")
+FILE_DIR = tornado_settings["file_upload_dir"]
 
 
 class MainHandler(CheckLoggedMixin, BaseHandler):
@@ -47,14 +48,19 @@ class DownloadHandler(CheckLoggedMixin, StaticFileHandler):
     """处理需要登录才能下载的文件"""
     async def get(self, *args, **kwargs) -> None:
         user_name, logged_in = self.check_login()
+        file_name = kwargs.get("file_name")
         if not logged_in:
             # 没登录禁止下载
-            raise tornado.web.HTTPError(
+            raise HTTPError(
                 403.16,
-                log_message=f"{user_name} 企图下载 {args}，但未成功",
+                log_message=f"{user_name} 企图下载 {file_name}，但未成功",
                 reason="Must login")
-        t_logging.info(f"{user_name} 正在下载 {args}")
-        await super().get(*args, **kwargs)
+        if not file_name:
+            # 强行访问此路由重定向到文件列表介面
+            self.redirect("/file")
+            raise Finish()
+        t_logging.info(f"{user_name} 正在下载 {file_name}")
+        await super().get(file_name)
 
 
 application = Application(
@@ -70,9 +76,9 @@ application = Application(
         (r"/wsscv$", CVHandler),
         (r"/vscode_settings$", VSCodeSettingsHandler),
         (r"/file(s)?(\.html)?$", UploadFileHandler),
-        (rf"/{tornado_settings['file_upload_dir']}/(.*\.*[\w\d]+)$",
+        (rf"/{FILE_DIR}/(?P<file_name>.*\.?[\w\d]*)$",
          DownloadHandler, {
-             "path": tornado_settings["file_upload_dir"],
+             "path": FILE_DIR,
          }),
         (r"/(.*\.(?!py\w*)\w+)$", StaticFileHandler, {
             "path": tornado_settings["static_dir"],
