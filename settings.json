@@ -2,13 +2,15 @@
     // 延伸模组：C/C++、Chinese (Traditional)、indent-rainbow、
     // Jupyter、Markdown Preview Enhanced、Monokai Pro、
     // Prettier - Code formatter、Python、Vim
-    "workbench.colorTheme": "Monokai Pro (Filter Machine)",
-    "workbench.iconTheme": "Monokai Pro (Filter Machine) Icons",
+    // %APPDATA%\Code\User\settings.json
+    // $HOME/.config/Code/User/settings.json
+    "workbench.colorTheme": "Monokai Pro (Filter Spectrum)",
+    "workbench.iconTheme": "Monokai Pro (Filter Spectrum) Icons",
     "workbench.preferredDarkColorTheme": "Monokai Pro (Filter Machine)",
     "workbench.editor.wrapTabs": true,
     "workbench.editor.openPositioning": "first",
     "workbench.editorAssociations": {
-        "*.ipynb": "jupyter.notebook.ipynb"
+        "*.ipynb": "jupyter-notebook"
     },
     "window.titleBarStyle": "custom",
     "window.zoomLevel": 0.7,
@@ -17,13 +19,14 @@
     "python.linting.flake8Enabled": true,
     "python.linting.flake8Args": [
         "--max-line-length=99",
-        "--extend-ignore=E701,F403,E502,E731"
+        "--extend-ignore=E701,F403,E502,E731,E402"
     ],
     "python.formatting.provider": "yapf",
+    "python.formatting.yapfArgs": ["--style={based_on_style: pep8}"],
     "python.terminal.launchArgs": [],
     "python.analysis.autoImportCompletions": false,
     "prettier.tabWidth": 4,
-    "editor.formatOnSave": false,
+    "editor.formatOnSave": true,
     "editor.fontFamily": "Consolas, 'Courier New', monospace",
     "editor.fontLigatures": false,
     "editor.fontSize": 15,
@@ -51,7 +54,6 @@
     "[typescript]": {
         "editor.defaultFormatter": "esbenp.prettier-vscode"
     },
-    "files.eol": "\n",
     "[shellscript]": {
         "files.eol": "\n"
     },
@@ -89,5 +91,17 @@
         }
     },
     "terminal.integrated.defaultProfile.windows": "PowerShell",
-    "terminal.integrated.defaultProfile.linux": "zsh"
+    "terminal.integrated.defaultProfile.linux": "zsh",
+    "notebook.cellToolbarLocation": {
+        "default": "right",
+        "jupyter-notebook": "left"
+    },
+    "files.associations": {
+        "*.json": "jsonc"
+    },
+    "files.insertFinalNewline": true,
+    "files.trimFinalNewlines": true,
+    "files.trimTrailingWhitespace": true,
+    "files.eol": "\n",
+    "remote.SSH.useLocalServer": true
 }
