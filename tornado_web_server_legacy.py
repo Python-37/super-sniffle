@@ -43,9 +43,9 @@ if __name__ == "__main__":
     # 时间单位 "other options:('S', 'M', 'H', 'D', 'W0'-'W6')"
     t_options.log_rotate_when = "D"
     t_options.log_rotate_interval = 5  # 间隔
-    t_options.log_file_prefix = "%s/logs/%s.log" % (os.path.dirname(
-        os.path.abspath(__file__)), time.strftime("%Y-%m-%d"))  # 文件名
-    t_options.log_file_num_backups = 10  # 间隔
+    t_options.log_file_prefix = "%s/logs/app.log" % (os.path.dirname(
+        os.path.abspath(__file__)), )
+    t_options.log_file_num_backups = 0
     t_options.log_to_stderr = True  # 输出到屏幕
     t_options.define("port", default=HOST_PORT, type=int)
     t_options.parse_command_line()

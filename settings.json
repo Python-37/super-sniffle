@@ -1,7 +1,8 @@
 {
     // 延伸模组：C/C++、Chinese (Traditional)、indent-rainbow、
     // Jupyter、Markdown Preview Enhanced、Monokai Pro、
-    // Prettier - Code formatter、Python、Vim
+    // Prettier - Code formatter、Python、Vim、Language-Cython
+
     // %APPDATA%\Code\User\settings.json
     // $HOME/.config/Code/User/settings.json
     "workbench.colorTheme": "Monokai Pro (Filter Spectrum)",

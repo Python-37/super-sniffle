@@ -51,10 +51,9 @@ class DownloadHandler(CheckLoggedMixin, StaticFileHandler):
         file_name = kwargs.get("file_name")
         if not logged_in:
             # 没登录禁止下载
-            raise HTTPError(
-                403.16,
-                log_message=f"{user_name} 企图下载 {file_name}，但未成功",
-                reason="Must login")
+            raise HTTPError(403.16,
+                            log_message=f"{user_name} 企图下载 {file_name}，但未成功",
+                            reason="Must login")
         if not file_name:
             # 强行访问此路由重定向到文件列表介面
             self.redirect("/file")
@@ -76,10 +75,9 @@ application = Application(
         (r"/wsscv$", CVHandler),
         (r"/vscode_settings$", VSCodeSettingsHandler),
         (r"/file(s)?(\.html)?$", UploadFileHandler),
-        (rf"/{FILE_DIR}/(?P<file_name>.*\.?[\w\d]*)$",
-         DownloadHandler, {
-             "path": FILE_DIR,
-         }),
+        (rf"/{FILE_DIR}/(?P<file_name>.*\.?[\w\d]*)$", DownloadHandler, {
+            "path": FILE_DIR,
+        }),
         (r"/(.*\.(?!py\w*)\w+)$", StaticFileHandler, {
             "path": tornado_settings["static_dir"],
             "default_filename": "README.md"
@@ -106,9 +104,9 @@ if __name__ == "__main__":
     # 时间单位 "other options:('S', 'M', 'H', 'D', 'W0'-'W6')"
     t_options.log_rotate_when = "D"
     t_options.log_rotate_interval = 5  # 间隔
-    t_options.log_file_prefix = "%s/logs/%s.log" % (os.path.dirname(
-        os.path.abspath(__file__)), time.strftime("%Y-%m-%d"))  # 文件名
-    t_options.log_file_num_backups = 10  # 间隔
+    t_options.log_file_prefix = "%s/logs/app.log" % (os.path.dirname(
+        os.path.abspath(__file__)), )
+    t_options.log_file_num_backups = 0
     t_options.log_to_stderr = True  # 输出到屏幕
     t_options.define("port", default=HOST_PORT, type=int)
     t_options.parse_command_line()
