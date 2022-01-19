@@ -9,9 +9,15 @@
     "workbench.iconTheme": "Monokai Pro (Filter Spectrum) Icons",
     "workbench.preferredDarkColorTheme": "Monokai Pro (Filter Machine)",
     "workbench.colorCustomizations": {
-        "scrollbarSlider.background": "#ffffff",
-        "scrollbarSlider.hoverBackground": "#ffffff",
-        "scrollbarSlider.activeBackground": "#ffffff",
+        // 滚动条
+        "scrollbarSlider.background": "#ffffff66",
+        "scrollbarSlider.hoverBackground": "#ffffff66",
+        "scrollbarSlider.activeBackground": "#ffffff66",
+        // 缩略滚动条
+        "minimapSlider.background": "#ffffff88",
+        "minimapSlider.hoverBackground": "#ffffff88",
+        "minimapSlider.activeBackground": "#ffffff88",
+        // 匹配括号
         "editorBracketMatch.background": "#00ff00"
     },
     "workbench.editor.wrapTabs": true,
