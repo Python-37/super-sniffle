@@ -40,8 +40,9 @@
     "python.analysis.autoImportCompletions": false,
     "prettier.tabWidth": 4,
     "editor.formatOnSave": true,
-    "editor.fontFamily": "Consolas, 'Courier New', monospace",
-    "editor.fontLigatures": false,
+    // https://github.com/tonsky/FiraCode
+    "editor.fontFamily": "'Fira Code', 'Fira Code', 'Fira Code'",
+    "editor.fontLigatures": "'ss01', 'ss02', 'ss03', 'ss04', 'ss05', 'ss06', 'zero', 'onum'",
     "editor.fontSize": 15,
     "editor.fontWeight": 500,
     "editor.lineNumbers": "on",
@@ -56,7 +57,10 @@
     "[shellscript]": {
         "files.eol": "\n"
     },
-    "terminal.integrated.fontFamily": "Consolas, 'Courier New', monospace",
+    "[python]": {
+        "editor.defaultFormatter": "ms-python.python"
+    },
+    "terminal.integrated.fontFamily": "'Fira Code', 'Fira Code', 'Fira Code'",
     "terminal.integrated.inheritEnv": false,
     "terminal.external.windowsExec": "C:\\Program Files\\PowerShell\\7\\pwsh.exe",
     "terminal.integrated.profiles.windows": {
