@@ -8,6 +8,12 @@
     "workbench.colorTheme": "Monokai Pro (Filter Spectrum)",
     "workbench.iconTheme": "Monokai Pro (Filter Spectrum) Icons",
     "workbench.preferredDarkColorTheme": "Monokai Pro (Filter Machine)",
+    "workbench.colorCustomizations": {
+        "scrollbarSlider.background": "#ffffff",
+        "scrollbarSlider.hoverBackground": "#ffffff",
+        "scrollbarSlider.activeBackground": "#ffffff",
+        "editorBracketMatch.background": "#00ff00"
+    },
     "workbench.editor.wrapTabs": true,
     "workbench.editor.openPositioning": "first",
     "workbench.editorAssociations": {
@@ -59,7 +65,6 @@
         "files.eol": "\n"
     },
     "terminal.integrated.fontFamily": "Consolas, 'Courier New', monospace",
-    "terminal.integrated.automationShell.windows": "",
     "terminal.integrated.inheritEnv": false,
     "terminal.external.windowsExec": "C:\\Program Files\\PowerShell\\7\\pwsh.exe",
     "terminal.integrated.profiles.windows": {
