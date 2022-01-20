@@ -1,4 +1,5 @@
-# cython: language_level=3
+# cython: language_level=3, c_string_type=unicode, c_string_encoding=utf8
+import gc
 from libc.stdlib cimport free, malloc
 
 from cpython.object cimport PyObject
@@ -24,8 +25,10 @@ ctypedef fused py_seq:
 cdef class MemoryNanny:
     cdef void* ptr
     cdef int h, w
+    cdef unicode str_attr
 
-    def __cinit__(self, N, img):
+    def __cinit__(self, N, img, str_attr):
+        self.str_attr = str_attr
         cdef np.npy_intp dims[2]
         dims[0] = N[0]; dims[1] = N[1]
         cdef uint8 *ptr = <uint8*>malloc(sizeof(uint8) * N[0] * N[1]);
@@ -49,10 +52,17 @@ cdef class MemoryNanny:
         dims[0] = self.h; dims[1] = self.w
         arr = np.PyArray_SimpleNewFromData(2, dims, np.NPY_UINT8, self.ptr)
         tmp = np.asarray(arr)
-        print("get array", tmp, tmp.shape, tmp.dtype)  # NOTE just debug
+        print("get array:", tmp, tmp.shape, tmp.dtype)  # NOTE just debug
         return tmp
+
+    def __call__(self):
+        arr = self._get_arr()
+        print(arr)
+        print("Get str attribute:", <unicode>self.str_attr)
 
 
 cpdef void create(py_seq size):
     img = np.random.randint(1, 255, size=size, dtype=np.uint8)  # 随机设定个值
-    MemoryNanny(size, img)
+    mn = MemoryNanny(size, img, "string attribute")
+    mn()
+    print(gc.get_referrers([mn]))
