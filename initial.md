@@ -9,8 +9,13 @@
 ## Linux 必要软件
 
 ```
-vim zsh fcitx fcitx-rime flameshot firefox-esr tree rsync unzip p7zip-full aria2 openbsd-netcat
+7z aria2 ark conky fcitx fcitx-rime firefox-esr flameshot kate kolourpaint openbsd-netcat rsync terminator tree vim zsh
 ```
+
+#### xfce 桌面锁屏工具
+
+> 卸载 xfce4-screensaver
+> 安装 light-locker
 
 ## 解决无法使用中文输入法问题
 
@@ -60,14 +65,6 @@ Type=Application
 StartupNotify=true
 Categories=TextEditor;Development;Utility;
 MimeType=text/plain;
-```
-
-## Vs Code 插件
-
-```text
-C/C++、Chinese (Traditional)、indent-rainbow、
-Jupyter、Markdown Preview Enhanced、Monokai Pro、
-Prettier - Code formatter、Python、Vim、YAML
 ```
 
 ## VS Code 添加网易云音乐插件无法使用问题
@@ -186,31 +183,8 @@ git push -f origin master
 	eol = lf
 ```
 
+## 删除 powershell 历史
+
 ```
 Remove-Item (Get-PSReadlineOption).HistorySavePath
-```
-
-## Windows Terminal elvish 配置
-
-```json
-{
-    "acrylicOpacity": 0.5,
-    "background": "#282A3A",
-    "closeOnExit": true,
-    "colorScheme": "Campbell",
-    "commandline": "D:\\Program Files (x86)\\elvish\\elvish-v0.14.1.exe",
-    "cursorColor": "#FFFFFF",
-    "cursorShape": "bar",
-    "fontFace": "Consolas",
-    "fontSize": 12,
-    "guid": "{f139a256-9953-4e30-93ce-1fe7b10f7ab5}",
-    "historySize": 9001,
-    // https://elv.sh/apple-touch-icon.png
-    "icon": "D:\\Program Files (x86)\\elvish\\apple-touch-icon.png",
-    "name": "elvish",
-    "padding": "0, 0, 0, 0",
-    "snapOnInput": true,
-    "startingDirectory": "%USERPROFILE%",
-    "useAcrylic": false
-},
 ```
