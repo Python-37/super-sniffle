@@ -6,7 +6,7 @@
     // %APPDATA%\Code\User\settings.json
     // $HOME/.config/Code/User/settings.json
     "workbench.colorTheme": "Monokai Pro (Filter Spectrum)",
-    "workbench.iconTheme": "Monokai Pro (Filter Spectrum) Icons",
+    "workbench.iconTheme": "vscode-icons",
     "workbench.preferredDarkColorTheme": "Monokai Pro (Filter Machine)",
     "workbench.colorCustomizations": {
         // 滚动条
@@ -18,7 +18,18 @@
         "minimapSlider.hoverBackground": "#ffffff88",
         "minimapSlider.activeBackground": "#ffffff88",
         // 匹配括号
-        "editorBracketMatch.background": "#00ff00"
+        "editorBracketMatch.background": "#00ff00",
+        // 选中部分颜色
+        "editor.selectionBackground": "#3399cc66",
+        "editor.selectionHighlightBackground": "#3399cc66",
+        "editor.selectionHighlightBorder": "#3399cc",
+        "selection.background": "#ffffff88",
+        // 活动标签上下边框颜色
+        "tab.activeBorder": "#ffffff",
+        "tab.activeBorderTop": "#ffffff"
+    },
+    "editor.tokenColorCustomizations": {
+        "comments": "#88eecc88" // 注释文字颜色
     },
     "workbench.editor.wrapTabs": true,
     "workbench.editor.openPositioning": "first",
@@ -26,7 +37,7 @@
         "*.ipynb": "jupyter-notebook"
     },
     "window.titleBarStyle": "custom",
-    "window.zoomLevel": 0.7,
+    "window.zoomLevel": 1.5,
     "python.linting.pylintEnabled": false,
     "python.linting.mypyEnabled": false,
     "python.linting.flake8Enabled": true,
@@ -62,20 +73,23 @@
     },
     "terminal.integrated.fontFamily": "'Fira Code', 'Fira Code', 'Fira Code'",
     "terminal.integrated.inheritEnv": false,
-    "terminal.external.windowsExec": "C:\\Program Files\\PowerShell\\7\\pwsh.exe",
+    // https://github.com/PowerShell/PowerShell/releases/latest
+    "terminal.external.windowsExec": "%ProgramFiles%\\PowerShell\\7\\pwsh.exe",
     "terminal.integrated.profiles.windows": {
         "Raw PowerShell": {
             "source": "PowerShell",
             "icon": "terminal-powershell"
         },
         "PowerShell": {
-            "path": "C:\\Program Files\\PowerShell\\7\\pwsh.exe",
+            // 必须安装 conda 才能使用，手动变更下面的路径
+            // 如果 conda 没有初始化，则运行`conda init powershell`
+            "path": "%ProgramFiles%\\PowerShell\\7\\pwsh.exe",
             "args": [
                 "-ExecutionPolicy",
                 "ByPass",
                 "-NoExit",
                 "-Command",
-                "& 'D:\\Miniconda3\\shell\\condabin\\conda-hook.ps1' ; conda activate 'D:\\Miniconda3'"
+                "& 'D:\\Miniconda3\\shell\\condabin\\conda-hook.ps1' ; conda activate base"
             ],
             "source": "PowerShell",
             "icon": "terminal-powershell"
