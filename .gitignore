@@ -13,6 +13,7 @@ logs/
 files/
 *_test.py
 *.mp4
+get-pip.py
 
 !static/*
 !settings.json

@@ -29,6 +29,13 @@ export QT_IM_MODULE=fcitx
 export XMODIFIERS="@im=fcitx"
 ```
 
+## Docker 常用指令
+
+```bash
+docker build -t py38:v1.0 .
+docker run -i -t -p 8000:8000 -v /path/to/code_dir:/home --name test py38:v1.0 python3.8 tornado_web_server.py -port=8000
+```
+
 ## Firefox 扩展套件
 
 ```text
