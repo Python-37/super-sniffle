@@ -71,6 +71,9 @@
     "[python]": {
         "editor.defaultFormatter": "ms-python.python"
     },
+    "[dockerfile]": {
+        "editor.defaultFormatter": "ms-azuretools.vscode-docker"
+    },
     "terminal.integrated.fontFamily": "'Fira Code', 'Fira Code', 'Fira Code'",
     "terminal.integrated.inheritEnv": false,
     // https://github.com/PowerShell/PowerShell/releases/latest
