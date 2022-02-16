@@ -79,21 +79,8 @@
     // https://github.com/PowerShell/PowerShell/releases/latest
     "terminal.external.windowsExec": "%ProgramFiles%\\PowerShell\\7\\pwsh.exe",
     "terminal.integrated.profiles.windows": {
-        "Raw PowerShell": {
-            "source": "PowerShell",
-            "icon": "terminal-powershell"
-        },
         "PowerShell": {
-            // 必须安装 conda 才能使用，手动变更下面的路径
-            // 如果 conda 没有初始化，则运行`conda init powershell`
-            "path": "%ProgramFiles%\\PowerShell\\7\\pwsh.exe",
-            "args": [
-                "-ExecutionPolicy",
-                "ByPass",
-                "-NoExit",
-                "-Command",
-                "& 'D:\\Miniconda3\\shell\\condabin\\conda-hook.ps1' ; conda activate base"
-            ],
+            // 如果使用 conda 则运行`conda init powershell`
             "source": "PowerShell",
             "icon": "terminal-powershell"
         },

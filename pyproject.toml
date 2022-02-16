@@ -1,0 +1,24 @@
+[tool.poetry]
+name = "my_code"
+version = "1.0.0"
+description = "我的样板代码"
+authors = ["Bavon Chao <chaochinghua@outlook.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.8"
+tornado = "^6.0"
+cython = "*"
+opencv-contrib-python = "^4.5.5"
+
+[tool.poetry.dev-dependencies]
+yapf = "^0.32.0"
+flake8 = "^4.0.1"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[[tool.poetry.source]]
+name = "neusoft"
+url = "https://mirrors.neusoft.edu.cn/pypi/web/simple"
+default = true
