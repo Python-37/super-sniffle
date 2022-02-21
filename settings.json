@@ -1,113 +1,108 @@
 {
-    // 延伸模组：C/C++、Chinese (Traditional)、indent-rainbow、
-    // Jupyter、Markdown Preview Enhanced、Monokai Pro、
-    // Prettier - Code formatter、Python、Vim、Language-Cython
+  // 延伸模组：C/C++、Chinese (Traditional)、indent-rainbow、
+  // Jupyter、Markdown Preview Enhanced、Monokai Pro、
+  // Prettier - Code formatter、Python、Vim、Language-Cython
 
-    // %APPDATA%\Code\User\settings.json
-    // $HOME/.config/Code/User/settings.json
-    "workbench.colorTheme": "Monokai Pro (Filter Spectrum)",
-    "workbench.iconTheme": "vscode-icons",
-    "workbench.preferredDarkColorTheme": "Monokai Pro (Filter Machine)",
-    "workbench.colorCustomizations": {
-        // 滚动条
-        "scrollbarSlider.background": "#ffffff66",
-        "scrollbarSlider.hoverBackground": "#ffffff66",
-        "scrollbarSlider.activeBackground": "#ffffff66",
-        // 缩略滚动条
-        "minimapSlider.background": "#ffffff88",
-        "minimapSlider.hoverBackground": "#ffffff88",
-        "minimapSlider.activeBackground": "#ffffff88",
-        // 匹配括号
-        "editorBracketMatch.background": "#00ff00",
-        // 选中部分颜色
-        "editor.selectionBackground": "#3399cc66",
-        "editor.selectionHighlightBackground": "#3399cc66",
-        "editor.selectionHighlightBorder": "#3399cc",
-        "selection.background": "#ffffff88",
-        // 活动标签上下边框颜色
-        "tab.activeBorder": "#ffffff",
-        "tab.activeBorderTop": "#ffffff"
+  // %APPDATA%\Code\User\settings.json
+  // $HOME/.config/Code/User/settings.json
+  "workbench.colorTheme": "Monokai Pro (Filter Spectrum)",
+  "workbench.iconTheme": "vscode-icons",
+  "workbench.preferredDarkColorTheme": "Monokai Pro (Filter Machine)",
+  "workbench.editor.wrapTabs": true,
+  "workbench.editor.openPositioning": "first",
+  "workbench.editorAssociations": {
+    "*.ipynb": "jupyter-notebook"
+  },
+  "workbench.colorCustomizations": {
+    // 滚动条
+    "scrollbarSlider.background": "#ffffff66",
+    "scrollbarSlider.hoverBackground": "#ffffff66",
+    "scrollbarSlider.activeBackground": "#ffffff66",
+    // 缩略滚动条
+    "minimapSlider.background": "#ffffff88",
+    "minimapSlider.hoverBackground": "#ffffff88",
+    "minimapSlider.activeBackground": "#ffffff88",
+    // 匹配括号
+    "editorBracketMatch.background": "#00ff00",
+    // 选中部分颜色
+    "editor.selectionBackground": "#3399cc77",
+    "editor.selectionHighlightBackground": "#3399cc66",
+    "editor.selectionHighlightBorder": "#3399cc",
+    "selection.background": "#ffffff88",
+    // 活动标签上下边框颜色
+    "tab.activeBorder": "#ffffff",
+    "tab.activeBorderTop": "#ffffff"
+  },
+  "window.titleBarStyle": "custom",
+  "window.zoomLevel": 1.5,
+  "python.linting.pylintEnabled": false,
+  "python.linting.mypyEnabled": false,
+  "python.linting.flake8Enabled": true,
+  "python.linting.flake8Args": [
+    "--max-line-length=99",
+    "--extend-ignore=E701,F403,E502,E731,E402"
+  ],
+  "python.formatting.provider": "yapf",
+  "python.formatting.yapfArgs": ["--style={based_on_style: pep8}"],
+  "python.terminal.launchArgs": [],
+  "python.analysis.autoImportCompletions": false,
+  "editor.formatOnSave": true,
+  // https://github.com/tonsky/FiraCode
+  "editor.fontFamily": "'Fira Code', 'Fira Code', 'Fira Code'",
+  "editor.fontLigatures": "'ss01', 'ss02', 'ss03', 'ss04', 'ss05', 'ss06', 'zero', 'onum'",
+  "editor.fontSize": 15,
+  "editor.fontWeight": 500,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.tokenColorCustomizations": {
+    "comments": "#88eecc88" // 注释文字颜色
+  },
+  "[yaml]": {
+    // Prettier 格式化 Rime 词库会出现问题，此处指定手动格式化
+    "editor.formatOnSave": false
+  },
+  "[shellscript]": {
+    "files.eol": "\n"
+  },
+  "[python]": {
+    "editor.defaultFormatter": "ms-python.python"
+  },
+  "[dockerfile]": {
+    "editor.defaultFormatter": "ms-azuretools.vscode-docker"
+  },
+  "terminal.integrated.fontFamily": "'Fira Code', 'Fira Code', 'Fira Code'",
+  "terminal.integrated.inheritEnv": false,
+  // https://github.com/PowerShell/PowerShell/releases/latest
+  "terminal.external.windowsExec": "%ProgramFiles%\\PowerShell\\7\\pwsh.exe",
+  "terminal.integrated.profiles.windows": {
+    "PowerShell": {
+      // 如果使用 conda 则运行`conda init powershell`
+      "source": "PowerShell",
+      "icon": "terminal-powershell"
     },
-    "editor.tokenColorCustomizations": {
-        "comments": "#88eecc88" // 注释文字颜色
+    "Command Prompt": {
+      "path": [
+        "${env:windir}\\Sysnative\\cmd.exe",
+        "${env:windir}\\System32\\cmd.exe"
+      ],
+      "args": [],
+      "icon": "terminal-cmd"
     },
-    "workbench.editor.wrapTabs": true,
-    "workbench.editor.openPositioning": "first",
-    "workbench.editorAssociations": {
-        "*.ipynb": "jupyter-notebook"
-    },
-    "window.titleBarStyle": "custom",
-    "window.zoomLevel": 1.5,
-    "python.linting.pylintEnabled": false,
-    "python.linting.mypyEnabled": false,
-    "python.linting.flake8Enabled": true,
-    "python.linting.flake8Args": [
-        "--max-line-length=99",
-        "--extend-ignore=E701,F403,E502,E731,E402"
-    ],
-    "python.formatting.provider": "yapf",
-    "python.formatting.yapfArgs": ["--style={based_on_style: pep8}"],
-    "python.terminal.launchArgs": [],
-    "python.analysis.autoImportCompletions": false,
-    "prettier.tabWidth": 4,
-    "editor.formatOnSave": true,
-    // https://github.com/tonsky/FiraCode
-    "editor.fontFamily": "'Fira Code', 'Fira Code', 'Fira Code'",
-    "editor.fontLigatures": "'ss01', 'ss02', 'ss03', 'ss04', 'ss05', 'ss06', 'zero', 'onum'",
-    "editor.fontSize": 15,
-    "editor.fontWeight": 500,
-    "editor.lineNumbers": "on",
-    "editor.cursorStyle": "line",
-    "editor.wordWrap": "off",
-    "editor.tabSize": 4,
-    "editor.defaultFormatter": "esbenp.prettier-vscode",
-    "[yaml]": {
-        // Prettier 格式化 Rime 词库会出现问题，此处指定手动格式化
-        "editor.formatOnSave": false
-    },
-    "[shellscript]": {
-        "files.eol": "\n"
-    },
-    "[python]": {
-        "editor.defaultFormatter": "ms-python.python"
-    },
-    "[dockerfile]": {
-        "editor.defaultFormatter": "ms-azuretools.vscode-docker"
-    },
-    "terminal.integrated.fontFamily": "'Fira Code', 'Fira Code', 'Fira Code'",
-    "terminal.integrated.inheritEnv": false,
-    // https://github.com/PowerShell/PowerShell/releases/latest
-    "terminal.external.windowsExec": "%ProgramFiles%\\PowerShell\\7\\pwsh.exe",
-    "terminal.integrated.profiles.windows": {
-        "PowerShell": {
-            // 如果使用 conda 则运行`conda init powershell`
-            "source": "PowerShell",
-            "icon": "terminal-powershell"
-        },
-        "Command Prompt": {
-            "path": [
-                "${env:windir}\\Sysnative\\cmd.exe",
-                "${env:windir}\\System32\\cmd.exe"
-            ],
-            "args": [],
-            "icon": "terminal-cmd"
-        },
-        "Git Bash": {
-            "source": "Git Bash"
-        }
-    },
-    "terminal.integrated.defaultProfile.windows": "PowerShell",
-    "terminal.integrated.defaultProfile.linux": "zsh",
-    "notebook.cellToolbarLocation": {
-        "default": "right",
-        "jupyter-notebook": "left"
-    },
-    "files.associations": {
-        "*.json": "jsonc"
-    },
-    "files.insertFinalNewline": true,
-    "files.trimFinalNewlines": true,
-    "files.trimTrailingWhitespace": true,
-    "files.eol": "\n",
-    "remote.SSH.useLocalServer": true
+    "Git Bash": {
+      "source": "Git Bash"
+    }
+  },
+  "terminal.integrated.defaultProfile.windows": "PowerShell",
+  "terminal.integrated.defaultProfile.linux": "zsh",
+  "files.associations": {
+    "*.json": "jsonc"
+  },
+  "files.insertFinalNewline": true,
+  "files.trimFinalNewlines": true,
+  "files.trimTrailingWhitespace": true,
+  "files.eol": "\n",
+  "remote.SSH.useLocalServer": true,
+  "notebook.cellToolbarLocation": {
+    "default": "right",
+    "jupyter-notebook": "left"
+  }
 }
