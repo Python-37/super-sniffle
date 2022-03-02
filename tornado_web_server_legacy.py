@@ -27,14 +27,14 @@ class MyHTTPServer(HTTPServer):
     is_closing = False
 
     def signal_handler(self, signum, frame):
-        t_logging.info('exiting...')
+        t_logging.info("exiting...")
         self.is_closing = True
 
     def try_exit(self):
         if self.is_closing:
             # clean up here
             tornado.ioloop.IOLoop.instance().stop()
-            t_logging.info('exit success')
+            t_logging.info("exit success")
 
 
 if __name__ == "__main__":
@@ -43,8 +43,7 @@ if __name__ == "__main__":
     # 时间单位 "other options:('S', 'M', 'H', 'D', 'W0'-'W6')"
     t_options.log_rotate_when = "D"
     t_options.log_rotate_interval = 5  # 间隔
-    t_options.log_file_prefix = "%s/logs/app.log" % (os.path.dirname(
-        os.path.abspath(__file__)), )
+    t_options.log_file_prefix = "%s/logs/app.log" % (os.path.dirname(os.path.abspath(__file__)),)
     t_options.log_file_num_backups = 0
     t_options.log_to_stderr = True  # 输出到屏幕
     t_options.define("port", default=HOST_PORT, type=int)

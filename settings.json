@@ -5,7 +5,7 @@
 
   // %APPDATA%\Code\User\settings.json
   // $HOME/.config/Code/User/settings.json
-  "workbench.colorTheme": "Monokai Pro (Filter Spectrum)",
+  "workbench.colorTheme": "Monokai Pro (Filter Ristretto)",
   "workbench.iconTheme": "vscode-icons",
   "workbench.preferredDarkColorTheme": "Monokai Pro (Filter Machine)",
   "workbench.editor.wrapTabs": true,
@@ -23,11 +23,14 @@
     "minimapSlider.hoverBackground": "#ffffff88",
     "minimapSlider.activeBackground": "#ffffff88",
     // 匹配括号
-    "editorBracketMatch.background": "#00ff00",
+    "editorBracketMatch.background": "#00ff00aa",
     // 选中部分颜色
     "editor.selectionBackground": "#3399cc77",
     "editor.selectionHighlightBackground": "#3399cc66",
     "editor.selectionHighlightBorder": "#3399cc",
+    // 单击变量名背景颜色
+    "editor.wordHighlightBackground": "#3399ccaa",
+    "editor.wordHighlightStrongBackground": "#3399cc66",
     "selection.background": "#ffffff88",
     // 活动标签上下边框颜色
     "tab.activeBorder": "#ffffff",
@@ -35,17 +38,15 @@
   },
   "window.titleBarStyle": "custom",
   "window.zoomLevel": 1.5,
-  "python.linting.pylintEnabled": false,
-  "python.linting.mypyEnabled": false,
   "python.linting.flake8Enabled": true,
   "python.linting.flake8Args": [
     "--max-line-length=99",
     "--extend-ignore=E701,F403,E502,E731,E402"
   ],
-  "python.formatting.provider": "yapf",
-  "python.formatting.yapfArgs": ["--style={based_on_style: pep8}"],
-  "python.terminal.launchArgs": [],
+  "python.formatting.provider": "black",
+  "python.formatting.blackArgs": ["--line-length=99"],
   "python.analysis.autoImportCompletions": false,
+  "editor.multiCursorModifier": "ctrlCmd",
   "editor.formatOnSave": true,
   // https://github.com/tonsky/FiraCode
   "editor.fontFamily": "'Fira Code', 'Fira Code', 'Fira Code'",
@@ -53,9 +54,6 @@
   "editor.fontSize": 15,
   "editor.fontWeight": 500,
   "editor.defaultFormatter": "esbenp.prettier-vscode",
-  "editor.tokenColorCustomizations": {
-    "comments": "#88eecc88" // 注释文字颜色
-  },
   "[yaml]": {
     // Prettier 格式化 Rime 词库会出现问题，此处指定手动格式化
     "editor.formatOnSave": false
