@@ -9,7 +9,10 @@
 ## Linux 必要软件
 
 ```
-7z aria2 ark conky fcitx fcitx-rime firefox-esr flameshot kate kolourpaint openbsd-netcat rsync terminator tree vim zsh
+aria2 firefox-esr openbsd-netcat
+fcitx fcitx-rime rsync terminator tree vim zsh light-locker
+7z ark dolphin
+flameshot kate kolourpaint kmix awesome blueman conky network-manager-applet
 ```
 
 #### xfce 桌面锁屏工具
