@@ -2,10 +2,11 @@
   // 延伸模组：C/C++、Chinese (Traditional)、indent-rainbow、
   // Jupyter、Markdown Preview Enhanced、Monokai Pro、
   // Prettier - Code formatter、Python、Vim、Language-Cython
+  // Black Formatter、isort、Flake8
 
   // %APPDATA%\Code\User\settings.json
   // $HOME/.config/Code/User/settings.json
-  "workbench.colorTheme": "Monokai Pro (Filter Ristretto)",
+  "workbench.colorTheme": "Monokai Pro",
   "workbench.iconTheme": "vscode-icons",
   "workbench.preferredDarkColorTheme": "Monokai Pro (Filter Machine)",
   "workbench.editor.wrapTabs": true,
@@ -14,47 +15,91 @@
     "*.ipynb": "jupyter-notebook"
   },
   "workbench.colorCustomizations": {
-    // 滚动条
-    "scrollbarSlider.background": "#ffffff66",
-    "scrollbarSlider.hoverBackground": "#ffffff66",
-    "scrollbarSlider.activeBackground": "#ffffff66",
+    // 匹配括号
+    "editorBracketMatch.background": "#00ff00aa",
     // 缩略滚动条
     "minimapSlider.background": "#ffffff88",
     "minimapSlider.hoverBackground": "#ffffff88",
     "minimapSlider.activeBackground": "#ffffff88",
-    // 匹配括号
-    "editorBracketMatch.background": "#00ff00aa",
-    // 选中部分颜色
-    "editor.selectionBackground": "#3399cc77",
-    "editor.selectionHighlightBackground": "#3399cc66",
-    "editor.selectionHighlightBorder": "#3399cc",
-    // 单击变量名背景颜色
-    "editor.wordHighlightBackground": "#3399ccaa",
-    "editor.wordHighlightStrongBackground": "#3399cc66",
-    "selection.background": "#ffffff88",
-    // 活动标签上下边框颜色
-    "tab.activeBorder": "#ffffff",
-    "tab.activeBorderTop": "#ffffff"
+    // 光标停留时工具列按钮颜色
+    "toolbar.hoverBackground": "#0000dddd",
+    "toolbar.hoverOutline": "#3399cc",
+    "[Monokai*]": {
+      // 滚动条
+      "scrollbarSlider.background": "#ffffff66",
+      "scrollbarSlider.hoverBackground": "#ffffff66",
+      "scrollbarSlider.activeBackground": "#ffffff66",
+      "scrollbar.shadow": "#00dddd",
+      // 单击变量名背景颜色
+      "editor.wordHighlightBackground": "#3399ccaa",
+      "editor.wordHighlightBorder": "#3399cc",
+      "editor.wordHighlightStrongBackground": "#3399cc66",
+      "editor.wordHighlightStrongBorder": "#3399cc",
+      // 选中部分颜色
+      "editor.selectionBackground": "#3399cc77",
+      "editor.selectionHighlightBackground": "#3399cc66",
+      "editor.selectionHighlightBorder": "#3399cc",
+      // 活动标签上下边框颜色
+      "tab.activeBorder": "#ffffff",
+      "tab.activeBorderTop": "#ffffff",
+      "tab.hoverBackground": "#00ffff33",
+      // 活动列颜色
+      "activityBar.foreground": "#00ffff",
+      // 小工具阴影
+      "widget.shadow": "#00aaaa",
+      // 检索输入框背景颜色
+      "selection.background": "#ffffff88"
+    }
   },
   "window.titleBarStyle": "custom",
   "window.zoomLevel": 1.5,
   "window.menuBarVisibility": "compact",
-  "python.linting.flake8Enabled": true,
-  "python.linting.flake8Args": [
-    "--max-line-length=99",
-    "--extend-ignore=E701,F403,E502,E731,E402,E203"
-  ],
-  "python.formatting.provider": "black",
-  "python.formatting.blackArgs": ["--line-length=99"],
+  // ++++++++++++++陈旧代码使用这里的设定++++++++++++++
+  // "python.linting.flake8Enabled": true,
+  // "python.linting.flake8Args": [
+  //   "--max-line-length=99",
+  //   "--extend-ignore=E701,F403,E502,E731,E402,E203"
+  // ],
+  // "python.formatting.provider": "black",
+  // "python.formatting.blackArgs": ["--line-length=99"],
+  // ++++++++++++++陈旧代码使用这里的设定++++++++++++++
   "python.analysis.autoImportCompletions": false,
+  // https://github.com/microsoft/vscode-python/issues/18264#issuecomment-1048568992
+  "python.terminal.activateEnvInCurrentTerminal": true,
+  // https://github.com/microsoft/vscode-pylint/issues/30
+  "pylint.args": [
+    "--disable=E1126,W0613,W0703,W0621,W1515,W0107",
+    "--generated-members=numpy.*,np.*,torch.*,cv2.*,cv.*",
+    "--persistent=n",
+    "--max-line-length=99"
+  ],
+  "pylint.severity": {
+    "convention": "Hint",
+    "error": "Error",
+    "fatal": "Error",
+    "refactor": "Hint",
+    "warning": "Warning",
+    "info": "Information",
+    "W1202": "Hint", // per error code
+    "W1203": "Hint",
+    "W0612": "Hint",
+    "unused-import": "Hint", // per error diagnostic
+    "abstract-method": "Hint"
+  },
+  "pylint.trace": "warn",
+  "black-formatter.args": ["--line-length=99"],
+  "isort.args": ["--profile", "black"],
   "editor.multiCursorModifier": "ctrlCmd",
   "editor.formatOnSave": true,
-  // https://github.com/tonsky/FiraCode
-  "editor.fontFamily": "'Fira Code', 'Fira Code', 'Fira Code'",
+  // https://github.com/tonsky/FiraCode/releases/latest
+  // https://github.com/lxgw/LxgwWenKai/releases/latest
+  "editor.fontFamily": "'Fira Code', 'LXGW WenKai'",
   "editor.fontLigatures": "'ss01', 'ss02', 'ss03', 'ss04', 'ss05', 'ss06', 'zero', 'onum'",
   "editor.fontSize": 15,
   "editor.fontWeight": 500,
   "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.guides.bracketPairs": true,
+  "editor.lineNumbers": "relative",
   "[yaml]": {
     // Prettier 格式化 Rime 词库会出现问题，此处指定手动格式化
     "editor.formatOnSave": false
@@ -63,12 +108,18 @@
     "files.eol": "\n"
   },
   "[python]": {
-    "editor.defaultFormatter": "ms-python.python"
+    "editor.defaultFormatter": "ms-python.black-formatter",
+    "editor.codeActionsOnSave": {
+      "source.organizeImports": true
+    }
   },
   "[dockerfile]": {
     "editor.defaultFormatter": "ms-azuretools.vscode-docker"
   },
-  "terminal.integrated.fontFamily": "'Fira Code', 'Fira Code', 'Fira Code'",
+  "[lua]": {
+    "editor.defaultFormatter": "sumneko.lua"
+  },
+  "terminal.integrated.fontFamily": "'Fira Code', 'LXGW WenKai'",
   "terminal.integrated.inheritEnv": false,
   // https://github.com/PowerShell/PowerShell/releases/latest
   "terminal.external.windowsExec": "%ProgramFiles%\\PowerShell\\7\\pwsh.exe",
@@ -85,9 +136,6 @@
       ],
       "args": [],
       "icon": "terminal-cmd"
-    },
-    "Git Bash": {
-      "source": "Git Bash"
     }
   },
   "terminal.integrated.defaultProfile.windows": "PowerShell",
@@ -99,9 +147,42 @@
   "files.trimFinalNewlines": true,
   "files.trimTrailingWhitespace": true,
   "files.eol": "\n",
+  "files.exclude": {
+    "**/__pycache__": true
+  },
   "remote.SSH.useLocalServer": true,
   "notebook.cellToolbarLocation": {
     "default": "right",
     "jupyter-notebook": "left"
+  },
+  "explorer.fileNesting.enabled": true,
+  "explorer.fileNesting.expand": false,
+  "explorer.fileNesting.patterns": {
+    "*.ts": "${capture}.js",
+    "*.js": "${capture}.js.map, ${capture}.min.js, ${capture}.d.ts",
+    "*.jsx": "${capture}.js",
+    "*.tsx": "${capture}.ts",
+    "tsconfig.json": "tsconfig.*.json",
+    "package.json": "package-lock.json, yarn.lock",
+    "README.md": ".gitignore, Dockerfile",
+    "test_.py": "test*",
+    // Cython
+    "*.pyx": "${capture}.pxd, ${capture}.*.pyd, ${capture}.*.so, ${capture}.c"
+  },
+  "Lua.telemetry.enable": false,
+  "telemetry.telemetryLevel": "off",
+  // "vim.useCtrlKeys": false,
+  "vim.handleKeys": {
+    "<C-f>": false, // 下翻一屏
+    "<C-b>": false, // 上翻一屏
+    "<C-d>": false, // 下翻半屏
+    "<C-u>": false, // 上翻半屏
+    "<C-e>": false, // 向下一行
+    "<C-y>": false, // 向上一行
+    "<C-c>": false,
+    "<C-v>": false,
+    "<C-a>": false,
+    "<C-s>": false,
+    "<C-z>": false
   }
 }
